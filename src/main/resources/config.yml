@@ -1,0 +1,87 @@
+#提示信息前缀
+prompt-prefix: '&a直播录制师'
+
+#菜单配置
+menu:
+  #边角填充方块配置
+  common:
+    corner:
+      material: MAGENTA_STAINED_GLASS_PANE
+      durability: 0
+    border:
+      material: BLUE_STAINED_GLASS_PANE
+      durability: 0
+  #宝石菜单配置
+  gem:
+    title: '&e宝石装配'
+    #为空时宝石槽的配置
+    slot:
+      battle:
+        name: '&d战斗&b宝石槽'
+        lore:
+          - '&e请将你的战斗宝石放在'
+          - '&e此处， 放入后将根据宝'
+          - '&e石等级获得攻击力加成'
+        item:
+          material: WHITE_STAINED_GLASS_PANE
+          durability: 0
+      life:
+        name: '&a生命&b宝石槽'
+        lore:
+          - '&e请将你的战斗宝石放在'
+          - '&e此处， 放入后将根据宝'
+          - '&e石等级获得攻击力加成'
+        item:
+          material: WHITE_STAINED_GLASS_PANE
+          durability: 0
+
+#宝石配置
+gem:
+  #战斗宝石
+  battle:
+    name: '&7[&6生存专家&7]&d战斗&b宝石&7[&eLv.{level}&7]'
+    lore:
+      - '&e这是由生存者的劳动凝成的精华'
+      - '&e由挖掘矿石产生的战斗点数换得'
+      - '&e装配后提供等级乘五的伤害加成'
+    item:
+      material: FIRE_CHARGE
+      durability: 0
+    #每级伤害值加成
+    bonus: 5
+  #生命宝石
+  life:
+    name: '&7[&6生存专家&7]&a生存&b宝石&7[&eLv.{level}&7]'
+    lore:
+      - '&e这是由生存者的劳动凝成的精华'
+      - '&e由采集作物产生的生存点数换得'
+      - '&e装配后提供等级乘五的生命加成'
+    item:
+      material: SLIME_BALL
+      durability: 0
+    #每级生命值加成
+    bonus: 5
+
+#全局配置
+setting:
+  #矿物配置
+  ore:
+    #矿物方块配置
+    blocks: COAL_ORE,IRON_ORE,GOLD_ORE,DIAMOND_ORE,EMERALD_ORE,LAPIS_ORE,REDSTONE_ORE,NETHER_QUARTZ_ORE
+    #获取战斗点数的几率
+    chance: 0.1
+  #作物配置
+  crop:
+    #作物方块配置
+    blocks: WHEAT,CARROTS,POTATOS,BEETROOTS,COCOA,NETHER_WARTS,CHORUS_FLOWER,SUGAR_CANE,PUMPKIN,MELON,CACTUS
+    #获取生存点数的几率
+    chance: 0.1
+
+#提示信息
+message:
+  earn-point: '&e恭喜你获得 &b1 &e{type} &e点数， 总点数 &b{total}'
+  gem-equip: '&e成功装配 &e{type} &e宝石， 等级 &b{level}'
+  un-equip: '&e你卸下了你的宝石， 加成将被移除'
+  type:
+      battle: '&d战斗'
+      life: '&a生命'
