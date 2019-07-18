@@ -1,10 +1,11 @@
 package cn.daniellee.plugin.lr;
 
+import cn.daniellee.plugin.lr.command.RecorderCommand;
 import cn.daniellee.plugin.lr.listener.PlayerListener;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
+import cn.daniellee.plugin.lr.runnable.LiveRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 public class LiveRecorder extends JavaPlugin {
 
@@ -12,11 +13,7 @@ public class LiveRecorder extends JavaPlugin {
 
     private String prefix;
 
-    private ProtocolManager protocolManager;
-
-    public void onLoad() {
-        protocolManager = ProtocolLibrary.getProtocolManager();
-    }
+    BukkitTask liveTask;
 
     public void onEnable(){
         instance = this;
@@ -29,45 +26,9 @@ public class LiveRecorder extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
 
-//        Bukkit.getPluginCommand("liverecorder").setExecutor(new ExpertCommand());
+        Bukkit.getPluginCommand("liverecorder").setExecutor(new RecorderCommand());
 
-//        protocolManager.addPacketListener(new PacketAdapter(this, ConnectionSide.SERVER_SIDE,
-//                Packets.Server.ENTITY_EQUIPMENT,
-//                Packets.Server.SET_SLOT,
-//                Packets.Server.WINDOW_ITEMS) {
-//            @Override
-//            public void onPacketSending(PacketEvent event) {
-//                PacketContainer packet = event.getPacket();
-//
-//                try {
-//                    // Player equipment
-//                    switch (event.getPacketID()) {
-//                        case Packets.Server.ENTITY_EQUIPMENT:
-//                            modifyItemStack(packet.getItemModifier().read(0));
-//                            break;
-//
-//                        case Packets.Server.SET_SLOT:
-//                            int slotID = packet.getSpecificModifier(int.class).read(1);
-//
-//                            // Modify equipment slots
-//                            if (slotID >= 5 && slotID < 9)
-//                                modifyItemStack(packet.getItemModifier().read(0));
-//                            break;
-//
-//                        case Packets.Server.WINDOW_ITEMS:
-//                            ItemStack[] stack = packet.getItemArrayModifier().read(0);
-//
-//                            for (int i = 5; i < 9; i++) {
-//                                modifyItemStack(stack[i]);
-//                            }
-//                            break;
-//                    }
-//
-//                } catch (FieldAccessException e) {
-//                    System.out.println("Couldn't access field.");
-//                }
-//            }
-//        });
+        liveTask = new LiveRunnable().runTaskTimerAsynchronously(this, 0, 20);
     }
 
     public void loadConfig() {
@@ -79,6 +40,8 @@ public class LiveRecorder extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (liveTask != null) liveTask.cancel();
+
         getLogger().info(" ");
         getLogger().info(">>>>>>>>>>>>>>>>>>>>>>>> LiveRecorder Unloaded <<<<<<<<<<<<<<<<<<<<<<<<");
         getLogger().info(" ");
@@ -92,7 +55,4 @@ public class LiveRecorder extends JavaPlugin {
         return prefix;
     }
 
-    public ProtocolManager getProtocolManager() {
-        return protocolManager;
-    }
 }

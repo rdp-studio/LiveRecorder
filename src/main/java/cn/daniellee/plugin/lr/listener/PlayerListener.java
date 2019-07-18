@@ -1,48 +1,31 @@
 package cn.daniellee.plugin.lr.listener;
 
-import cn.daniellee.plugin.lr.LiveRecorder;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketContainer;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import cn.daniellee.plugin.lr.core.LiveCore;
+import cn.daniellee.plugin.lr.model.ActivePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.util.Vector;
-
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
 
 public class PlayerListener implements Listener {
 
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
-//		Location from = e.getFrom();
-		Location to = e.getTo().clone();
-//		double x = new BigDecimal(e.getTo().getX()).subtract(new BigDecimal(e.getFrom().getX())).doubleValue();
-//		double y = new BigDecimal(e.getTo().getY()).subtract(new BigDecimal(e.getFrom().getY())).doubleValue();
-//		double z = new BigDecimal(e.getTo().getZ()).subtract(new BigDecimal(e.getFrom().getZ())).doubleValue();
-//		Vector vector = new Vector(x, y, z);
-		Player recorder = Bukkit.getPlayer("Recorder");
-		to.setY(to.getY() + 2);
-
-		try {
-			PacketContainer container = new PacketContainer(PacketType.Play.Server.REL_ENTITY_MOVE_LOOK);
-			Bukkit.broadcastMessage(container.toString());
-//			container.getDoubles().write(1, to.getX());
-//			container.getDoubles().write(2, to.getY());
-//			container.getDoubles().write(3, to.getZ());
-//			container.getBytes().write(0, (byte) to.getYaw());
-//			container.getBytes().write(1, (byte) to.getPitch());
-			LiveRecorder.getInstance().getProtocolManager().sendServerPacket(recorder, container);
-		} catch (InvocationTargetException ex) {
-			ex.printStackTrace();
-		}
-
-//		Bukkit.broadcastMessage(e.getTo().subtract(e.getFrom()).toString());
-//		recorder.getLocation().setDirection(e.getPlayer().getLocation().getDirection()).toVector()
-//		recorder.setVelocity();
+        Player player = e.getPlayer();
+        // 更新活跃玩家列表
+        ActivePlayer activePlayer = LiveCore.getActivePlayerByName(player.getName());
+        if (activePlayer != null) {
+            activePlayer.setLastActive(System.currentTimeMillis());
+        } else {
+            activePlayer = new ActivePlayer(player.getName(), System.currentTimeMillis());
+            LiveCore.activePlayers.add(activePlayer);
+        }
+        // 如果正在被录制则移动镜头
+		if (player.getName().equals(LiveCore.recordingPlayer)) {
+            if (LiveCore.recorder != null && e.getTo() != null) {
+                LiveCore.recorder.setVelocity(LiveCore.getVectorByFormTo(e.getFrom(), e.getTo()));
+            }
+        }
 	}
 
 }
