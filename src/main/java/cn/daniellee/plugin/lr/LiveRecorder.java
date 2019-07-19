@@ -9,11 +9,13 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class LiveRecorder extends JavaPlugin {
 
+	private static final String PACKAGE_VERSION = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+
     private static LiveRecorder instance;
 
     private String prefix;
 
-    BukkitTask liveTask;
+    private BukkitTask liveTask;
 
     public void onEnable(){
         instance = this;
@@ -28,7 +30,7 @@ public class LiveRecorder extends JavaPlugin {
 
         Bukkit.getPluginCommand("liverecorder").setExecutor(new RecorderCommand());
 
-        liveTask = new LiveRunnable().runTaskTimerAsynchronously(this, 0, 20);
+        liveTask = new LiveRunnable().runTaskTimer(this, 0, 20);
     }
 
     public void loadConfig() {
@@ -55,4 +57,7 @@ public class LiveRecorder extends JavaPlugin {
         return prefix;
     }
 
+	public static Class<?> getNMSClass(String nmsClassName) throws ClassNotFoundException {
+		return Class.forName("net.minecraft.server." + PACKAGE_VERSION + "." + nmsClassName);
+	}
 }
