@@ -71,7 +71,7 @@ public class LiveRunnable extends BukkitRunnable {
                 LiveCore.recordingPlayer = activePlayer.getName();
             }
             recordedSeconds++;
-            if (recordedSeconds == recordSeconds || LiveCore.recordingPlayer == null || Bukkit.getPlayer(LiveCore.recordingPlayer) == null) recordedSeconds = 0;
+            if (recordedSeconds > recordSeconds || LiveCore.recordingPlayer == null || Bukkit.getPlayer(LiveCore.recordingPlayer) == null) recordedSeconds = 0;
         }
     }
 

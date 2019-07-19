@@ -34,7 +34,6 @@ public class RecorderCommand implements CommandExecutor {
                 if (target != null) {
                     LiveCore.recorder.teleport(LiveCore.getLiveLovation(target.getLocation()));
                     LiveCore.recordingPlayer = strings[1];
-                    commandSender.sendMessage(((Player)commandSender).getLocation().getYaw() + "");
                     commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.target-set", "&eThe target player has been set as the recording object.")).replace("&", "§"));
                 } else commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.invalid-player", "&eTarget player does not exist.")).replace("&", "§"));
             } else if ("time".equalsIgnoreCase(strings[0]) && strings.length > 1) {

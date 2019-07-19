@@ -8,9 +8,11 @@ setting:
   inactivity-timeout: 5
   camera-pitch: 45
   camera-distance: 3
-  #如果安装了多世界插件，这个一定要设置。为观察者设置游戏模式权限的语句
   recorder-permission:
+    #如果安装了多世界插件，这个一定要设置
     - mv.bypass.gamemode.*
+    #领地插件传送权限
+    - residence.tpbypass
   permission-command: 'lp user {recorder} permission set {permission} true'
 
 
