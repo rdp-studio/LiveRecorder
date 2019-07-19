@@ -4,8 +4,8 @@ prompt-prefix: '&a直播助手'
 #全局配置
 setting:
   recorder-name: Recorder
-  record-seconds: 30
-  inactivity-timeout: 15
+  record-seconds: 15
+  inactivity-timeout: 5
   camera-pitch: 45
   camera-distance: 3
   #如果安装了多世界插件，这个一定要设置。为观察者设置游戏模式权限的语句

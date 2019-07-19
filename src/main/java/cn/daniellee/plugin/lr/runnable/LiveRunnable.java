@@ -35,6 +35,8 @@ public class LiveRunnable extends BukkitRunnable {
                     }
                 }
                 Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.online", "&eThe live recording started, all ready for the mirror~")).replace("&", "§"));
+                recorder.setAllowFlight(true);
+                recorder.setFlying(true);
                 recorder.setGameMode(GameMode.SPECTATOR);
                 LiveCore.recorder = recorder;
             }
@@ -44,9 +46,9 @@ public class LiveRunnable extends BukkitRunnable {
             } else LiveCore.recorder = null;
         }
         // 每个玩家播出的时间
-        int recordSeconds = LiveRecorder.getInstance().getConfig().getInt("setting.record-seconds", 30);
+        int recordSeconds = LiveRecorder.getInstance().getConfig().getInt("setting.record-seconds", 15);
         // 当作不活跃的超时时间
-        int inactivityTimeout = LiveRecorder.getInstance().getConfig().getInt("setting.inactivity-timeout", 15);
+        int inactivityTimeout = LiveRecorder.getInstance().getConfig().getInt("setting.inactivity-timeout", 5);
         synchronized (LiveCore.activePlayers) {
             // 清理不活跃的
             for (int i = 0; i < LiveCore.activePlayers.size();) {
