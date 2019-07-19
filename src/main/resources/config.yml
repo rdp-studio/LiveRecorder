@@ -11,8 +11,8 @@ setting:
   recorder-permission:
     #如果安装了多世界插件，这个一定要设置
     - mv.bypass.gamemode.*
-    #领地插件传送权限
-    - residence.tpbypass
+    #领地插件传送和移动权限
+    - residence.admin.*
   permission-command: 'lp user {recorder} permission set {permission} true'
 
 
