@@ -32,6 +32,13 @@ public class RecorderCommand implements CommandExecutor {
             } else if ("target".equalsIgnoreCase(strings[0]) && strings.length > 1) {
                 Player target = Bukkit.getPlayer(strings[1]);
                 if (target != null) {
+	                if (LiveCore.recordingPlayer != null) {
+		                Player current = Bukkit.getPlayer(LiveCore.recordingPlayer);
+		                if (current != null) {
+			                current.setGlowing(false);
+		                }
+	                }
+	                target.setGlowing(true);
                     LiveCore.recorder.teleport(LiveCore.getLiveLovation(target.getLocation()));
                     LiveCore.recordingPlayer = strings[1];
                     commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.target-set", "&eThe target player has been set as the recording object.")).replace("&", "§"));

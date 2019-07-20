@@ -3,16 +3,23 @@ prompt-prefix: '&a直播助手'
 
 #全局配置
 setting:
+  #直播员名字
   recorder-name: Recorder
+  #每个玩家的直播时间
   record-seconds: 15
+  #判定为不活跃的时间
   inactivity-timeout: 5
+  #镜头俯角
   camera-pitch: 45
+  #镜头距离
   camera-distance: 3
+  #自动为直播员添加的权限
   recorder-permission:
     #如果安装了多世界插件，这个一定要设置
     - mv.bypass.gamemode.*
     #领地插件传送和移动权限
     - residence.admin.*
+  #给予上述权限所用的指令
   permission-command: 'lp user {recorder} permission set {permission} true'
 
 

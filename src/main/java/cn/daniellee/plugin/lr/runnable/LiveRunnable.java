@@ -59,6 +59,12 @@ public class LiveRunnable extends BukkitRunnable {
             }
             // 随机将一位玩家进行直播
             if (recordedSeconds == 0 && LiveCore.recorder != null && !LiveCore.activePlayers.isEmpty()) {
+                if (LiveCore.recordingPlayer != null) {
+                    Player current = Bukkit.getPlayer(LiveCore.recordingPlayer);
+                    if (current != null) {
+                        current.setGlowing(false);
+                    }
+                }
                 ActivePlayer activePlayer;
                 Player player;
                 do {
@@ -66,6 +72,7 @@ public class LiveRunnable extends BukkitRunnable {
                     player = Bukkit.getPlayer(activePlayer.getName());
                 } while (player == null || !player.isValid());
                 // 计算镜头位置
+                player.setGlowing(true);
                 player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
                 LiveCore.recorder.teleport(LiveCore.getLiveLovation(player.getLocation()));
                 LiveCore.recordingPlayer = activePlayer.getName();
