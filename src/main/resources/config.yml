@@ -26,7 +26,7 @@ setting:
 #提示信息
 message:
   reload-success: '&e配置信息重载成功'
-  time-set: '&e每个玩家直播的时间设置成功'
+  time-set: '&e每个玩家被直播的时间设置成功'
   recorder-come: '&e恭喜你上镜啦， 快在镜头前秀波操作吧~'
   target-set: '&e已设置目标玩家为直播对象'
   recorder-set: '&e已设置目标玩家为直播录制者'
@@ -36,5 +36,13 @@ message:
   boardcast:
    online: '&e直播开始啦， 全体做好上镜准备~'
    offline: '&e直播结束啦， 感谢小伙伴们的支持~'
+
+#帮助信息
+help:
+  target: '&e设置目标玩家为直播对象'
+  time: '&e设置每个玩家被直播的时间'
+  recorder: '&e设置目标玩家为直播录制者'
+  reset: '&e重设直播时间, 将自动切换直播目标'
+  reload: '&e重载插件配置文件'
 
 

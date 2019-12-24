@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
  */
 public class ActionSender {
 
-	public ActionSender(Player player, String message) {
+	public static void send(Player player, String message) {
 		try {
 			Object chatComponentText = LiveRecorder.getNMSClass("ChatComponentText").getConstructor(new Class[] { String.class }).newInstance(message);
 			Object chatMessageType = LiveRecorder.getNMSClass("ChatMessageType").getField("GAME_INFO").get(null);

@@ -42,7 +42,7 @@ public class LiveRunnable extends BukkitRunnable {
             }
         } else {
             if (LiveCore.recorder.isValid()) {
-                new ActionSender(LiveCore.recorder, LiveRecorder.getInstance().getConfig().getString("message.action", "&bOnline: {online}").replace("{online}", Integer.toString(Bukkit.getOnlinePlayers().size())).replace("&", "§"));
+                ActionSender.send(LiveCore.recorder, LiveRecorder.getInstance().getConfig().getString("message.action", "&bOnline: {online}").replace("{online}", Integer.toString(Bukkit.getOnlinePlayers().size())).replace("&", "§"));
             } else {
                 if (LiveCore.recorder.isDead()) LiveCore.recorder.setHealth(20);
                 if (!LiveCore.recorder.isValid()) LiveCore.recorder = null;

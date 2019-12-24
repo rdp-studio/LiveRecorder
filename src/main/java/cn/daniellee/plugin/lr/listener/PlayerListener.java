@@ -1,11 +1,13 @@
 package cn.daniellee.plugin.lr.listener;
 
 import cn.daniellee.plugin.lr.LiveRecorder;
+import cn.daniellee.plugin.lr.component.LocationSender;
 import cn.daniellee.plugin.lr.core.LiveCore;
 import cn.daniellee.plugin.lr.model.ActivePlayer;
 import cn.daniellee.plugin.lr.runnable.LiveRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
