@@ -33,7 +33,7 @@ public class LiveCore {
         return null;
     }
 
-    public static Location getLiveLovation(Location location) {
+    public static Location getLiveLocation(Location location) {
         // 读取镜头角度
         double pitch = LiveRecorder.getInstance().getConfig().getDouble("setting.camera-pitch", 45D);
         // 读取录制距离

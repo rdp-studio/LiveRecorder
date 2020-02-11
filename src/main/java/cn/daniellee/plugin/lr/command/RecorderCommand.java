@@ -34,9 +34,11 @@ public class RecorderCommand implements CommandExecutor {
 		                }
 	                }
 	                target.setGlowing(true);
-                    LiveCore.recorder.teleport(LiveCore.getLiveLovation(target.getLocation()));
-                    LiveCore.recordingPlayer = strings[1];
-                    commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.target-set", "&eThe target player has been set as the recording object.")).replace("&", "§"));
+	                if (LiveCore.recorder != null) {
+                        LiveCore.recorder.teleport(LiveCore.getLiveLocation(target.getLocation()));
+                        LiveCore.recordingPlayer = strings[1];
+                        commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.target-set", "&eThe target player has been set as the recording object.")).replace("&", "§"));
+                    } else commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.no-recorder", "&eThe recorder is not online and cannot set the target.")).replace("&", "§"));
                 } else commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.invalid-player", "&eTarget player does not exist.")).replace("&", "§"));
             } else if ("time".equalsIgnoreCase(strings[0]) && strings.length > 1) {
                 LiveRecorder.getInstance().getConfig().set("setting.record-seconds", Integer.valueOf(strings[1]));

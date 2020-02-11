@@ -17,6 +17,8 @@ public class LiveRecorder extends JavaPlugin {
 
     private BukkitTask liveTask;
 
+    private boolean hideCamera;
+
     public void onEnable(){
         instance = this;
 
@@ -37,6 +39,7 @@ public class LiveRecorder extends JavaPlugin {
         getLogger().info("[LiveRecorder] Loading config...");
         if(!getDataFolder().exists()) getDataFolder().mkdirs();
         prefix = "&7[&b" + getConfig().get("prompt-prefix", "LiveRecorder") + "&7] &3: &r";
+        hideCamera = getConfig().getBoolean("setting.hide-camera", false);
         saveDefaultConfig();
     }
 
@@ -57,7 +60,11 @@ public class LiveRecorder extends JavaPlugin {
         return prefix;
     }
 
-	public static Class<?> getNMSClass(String nmsClassName) throws ClassNotFoundException {
+    public boolean isHideCamera() {
+        return hideCamera;
+    }
+
+    public static Class<?> getNMSClass(String nmsClassName) throws ClassNotFoundException {
 		return Class.forName("net.minecraft.server." + PACKAGE_VERSION + "." + nmsClassName);
 	}
 }

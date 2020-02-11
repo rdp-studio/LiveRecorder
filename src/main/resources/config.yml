@@ -9,6 +9,8 @@ setting:
   record-seconds: 15
   #判定为不活跃的时间
   inactivity-timeout: 5
+  #隐藏镜头位置
+  hide-camera: false
   #镜头俯角
   camera-pitch: 45
   #镜头距离
@@ -31,6 +33,7 @@ message:
   target-set: '&e已设置目标玩家为直播对象'
   recorder-set: '&e已设置目标玩家为直播录制者'
   invalid-player: '&e目标玩家不存在'
+  no-recorder: '&e录制者未在线, 无法设置直播目标'
   second-reset: '&e重设成功， 将自动切换直播目标'
   action: '&b在线人数： {online}'
   boardcast:
@@ -44,5 +47,3 @@ help:
   recorder: '&e设置目标玩家为直播录制者'
   reset: '&e重设直播时间, 将自动切换直播目标'
   reload: '&e重载插件配置文件'
-
-

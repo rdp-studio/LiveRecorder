@@ -1,19 +1,17 @@
 package cn.daniellee.plugin.lr.listener;
 
 import cn.daniellee.plugin.lr.LiveRecorder;
-import cn.daniellee.plugin.lr.component.LocationSender;
 import cn.daniellee.plugin.lr.core.LiveCore;
 import cn.daniellee.plugin.lr.model.ActivePlayer;
 import cn.daniellee.plugin.lr.runnable.LiveRunnable;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 
 public class PlayerListener implements Listener {
@@ -26,7 +24,10 @@ public class PlayerListener implements Listener {
 			if (LiveCore.recorder != null && e.getTo() != null) {
 				if (LiveCore.recorder.canSee(player)) {
 					LiveCore.recorder.setVelocity(LiveCore.getVectorByFormTo(e.getFrom(), e.getTo()));
-					LiveCore.recorder.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, LiveCore.recorder.getLocation(), 1);
+					// 显示镜头位置粒子
+					if (!LiveRecorder.getInstance().isHideCamera()) {
+						LiveCore.recorder.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, LiveCore.recorder.getLocation(), 1);
+					}
 				} else {
 					LiveRunnable.resetRecordedSeconds();
 				}
@@ -47,7 +48,7 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
 		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && e.getTo() != null) {
-			LiveCore.recorder.teleport(LiveCore.getLiveLovation(e.getTo()));
+			LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
 		}
 	}
 
@@ -65,6 +66,14 @@ public class PlayerListener implements Listener {
 		if (e.getEntity().getName().equals(LiveCore.recordingPlayer)) {
 			LiveRunnable.resetRecordedSeconds();
 		}
+	}
+
+	@EventHandler
+	public void onInventoryOpen(InventoryOpenEvent e) {
+	}
+
+	@EventHandler
+	public void onInventoryClose(InventoryCloseEvent e) {
 	}
 
 }

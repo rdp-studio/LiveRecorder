@@ -77,7 +77,7 @@ public class LiveRunnable extends BukkitRunnable {
                 // 计算镜头位置
                 player.setGlowing(true);
                 player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
-                LiveCore.recorder.teleport(LiveCore.getLiveLovation(player.getLocation()));
+                LiveCore.recorder.teleport(LiveCore.getLiveLocation(player.getLocation()));
                 LiveCore.recordingPlayer = activePlayer.getName();
             }
             recordedSeconds++;
