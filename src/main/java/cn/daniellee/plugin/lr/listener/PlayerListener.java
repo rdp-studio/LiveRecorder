@@ -47,7 +47,7 @@ public class PlayerListener implements Listener {
 
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
-		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && e.getTo() != null) {
+		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && e.getTo() != null && LiveCore.recorder != null) {
 			LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
 		}
 	}
