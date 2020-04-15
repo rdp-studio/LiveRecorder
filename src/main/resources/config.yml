@@ -11,6 +11,8 @@ setting:
   inactivity-timeout: 5
   #隐藏镜头位置
   hide-camera: false
+  #展示玩家打开的容器
+  show-inventory: true
   #镜头俯角
   camera-pitch: 45
   #镜头距离
@@ -23,7 +25,6 @@ setting:
     - residence.admin.*
   #给予上述权限所用的指令
   permission-command: 'lp user {recorder} permission set {permission} true'
-
 
 #提示信息
 message:

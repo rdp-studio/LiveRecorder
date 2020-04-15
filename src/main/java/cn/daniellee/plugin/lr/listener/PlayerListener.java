@@ -70,14 +70,14 @@ public class PlayerListener implements Listener {
 
 	@EventHandler
 	public void onInventoryOpen(InventoryOpenEvent e) {
-		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && LiveCore.recorder != null) {
+		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && LiveCore.recorder != null && LiveRecorder.getInstance().getConfig().getBoolean("setting.show-inventory", false)) {
 			LiveCore.recorder.openInventory(e.getInventory());
 		}
 	}
 
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent e) {
-		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && LiveCore.recorder != null) {
+		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && LiveCore.recorder != null && LiveRecorder.getInstance().getConfig().getBoolean("setting.show-inventory", false)) {
 			LiveCore.recorder.closeInventory();
 		}
 	}
