@@ -70,6 +70,7 @@ public class LiveRunnable extends BukkitRunnable {
                 }
                 ActivePlayer activePlayer;
                 Player player;
+                // 循环寻找下一个直播对象
                 do {
                     activePlayer = LiveCore.activePlayers.get(new Random().nextInt(LiveCore.activePlayers.size()));
                     player = Bukkit.getPlayer(activePlayer.getName());

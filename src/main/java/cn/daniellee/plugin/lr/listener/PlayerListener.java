@@ -55,6 +55,7 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer)) {
+			e.getPlayer().setGlowing(false);
 			LiveRunnable.resetRecordedSeconds();
 		} else if (LiveCore.recorder != null && e.getPlayer().getName().equals(LiveCore.recorder.getName())) {
 			Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.offline", "&eThe live recording is over, thanks to the support of the friends~")).replace("&", "§"));
