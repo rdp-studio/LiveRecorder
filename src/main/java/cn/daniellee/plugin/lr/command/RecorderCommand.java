@@ -24,26 +24,19 @@ public class RecorderCommand implements CommandExecutor {
                 LiveRecorder.getInstance().loadConfig();
                 commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.reload-success", "&eConfiguration reload completed.")).replace("&", "§"));
                 return true;
-            } else if ("target".equalsIgnoreCase(strings[0]) && strings.length > 1) {
+            } else if ("target".equalsIgnoreCase(strings[0]) && strings.length > 2) {
                 Player target = Bukkit.getPlayer(strings[1]);
                 if (target != null) {
-	                if (LiveCore.recordingPlayer != null) {
-		                Player current = Bukkit.getPlayer(LiveCore.recordingPlayer);
-		                if (current != null) {
-			                current.setGlowing(false);
-		                }
-	                }
-	                target.setGlowing(true);
 	                if (LiveCore.recorder != null) {
                         LiveCore.recorder.teleport(LiveCore.getLiveLocation(target.getLocation()));
                         LiveCore.recordingPlayer = strings[1];
                         commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.target-set", "&eThe target player has been set as the recording object.")).replace("&", "§"));
                     } else commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.no-recorder", "&eThe recorder is not online and cannot set the target.")).replace("&", "§"));
                 } else commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.invalid-player", "&eTarget player does not exist.")).replace("&", "§"));
-            } else if ("time".equalsIgnoreCase(strings[0]) && strings.length > 1) {
+            } else if ("time".equalsIgnoreCase(strings[0]) && strings.length > 2) {
                 LiveRecorder.getInstance().getConfig().set("setting.record-seconds", Integer.valueOf(strings[1]));
                 commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.time-set", "&eThe time of each player's live recording is set successfully.")).replace("&", "§"));
-            } else if ("recorder".equalsIgnoreCase(strings[0]) && strings.length > 1) {
+            } else if ("recorder".equalsIgnoreCase(strings[0]) && strings.length > 2) {
                 Player recorder = Bukkit.getPlayer(strings[1]);
                 if (recorder != null) {
                     LiveCore.recorder = recorder;
