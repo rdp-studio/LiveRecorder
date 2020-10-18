@@ -29,8 +29,6 @@ public class LocationSender {
 			Object packet = clazz.getConstructor(new Class[] { int.class, byte.class, byte.class, boolean.class }).newInstance(new Object[] { player.getEntityId(), yaw, pitch, false });
 //
 //			Object packet = clazz.getConstructor(new Class[] { int.class, long.class, long.class, long.class, byte.class, byte.class, boolean.class }).newInstance(new Object[] { player.getEntityId(), x, y, z, yaw, pitch, false });
-//
-
 
 //			Field x = clazz.getDeclaredField("x");
 //			x.setAccessible(true);
@@ -59,14 +57,10 @@ public class LocationSender {
 //			hasLook.setAccessible(true);
 //			hasLook.setBoolean(packet, true);
 //
-//
 //			Bukkit.broadcastMessage(packet.toString()  + "------" + x.get(packet));
-
 //
 //			Class clazz = LiveRecorder.getNMSClass("PacketPlayOutPosition");
 //			Object packet = clazz.getConstructor(new Class[] { double.class, double.class, double.class, float.class, float.class, Set.class, int.class });
-
-
 
 			Object getHandle = player.getClass().getMethod("getHandle").invoke(player);
 			Object playerConnection = getHandle.getClass().getField("playerConnection").get(getHandle);
