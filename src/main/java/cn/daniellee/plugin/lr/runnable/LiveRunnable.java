@@ -56,19 +56,16 @@ public class LiveRunnable extends BukkitRunnable {
             // 清理不活跃的
             for (int i = 0; i < LiveCore.activePlayers.size();) {
                 ActivePlayer activePlayer = LiveCore.activePlayers.get(i);
-                if (System.currentTimeMillis() - activePlayer.getLastActive() > inactivityTimeout * 1000) {
+                Player player = Bukkit.getPlayer(activePlayer.getName());
+                if (player == null || !player.isValid() || System.currentTimeMillis() - activePlayer.getLastActive() > inactivityTimeout * 1000) {
                    LiveCore.activePlayers.remove(i);
                 } else i++;
             }
             // 随机将一位玩家进行直播
             if (recordedSeconds == 0 && LiveCore.recorder != null && !LiveCore.activePlayers.isEmpty()) {
-                ActivePlayer activePlayer;
-                Player player;
-                // 循环寻找下一个直播对象
-                do {
-                    activePlayer = LiveCore.activePlayers.get(new Random().nextInt(LiveCore.activePlayers.size()));
-                    player = Bukkit.getPlayer(activePlayer.getName());
-                } while (player == null || !player.isValid());
+                ActivePlayer activePlayer = LiveCore.activePlayers.get(new Random().nextInt(LiveCore.activePlayers.size()));
+                Player player = Bukkit.getPlayer(activePlayer.getName());
+                if (player == null || !player.isValid()) return;
                 // 计算镜头位置
                 player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
                 LiveCore.recorder.teleport(LiveCore.getLiveLocation(player.getLocation()));
