@@ -3,6 +3,7 @@ package cn.daniellee.plugin.lr.listener;
 import cn.daniellee.plugin.lr.LiveRecorder;
 import cn.daniellee.plugin.lr.core.LiveCore;
 import cn.daniellee.plugin.lr.model.ActivePlayer;
+import cn.daniellee.plugin.lr.model.PlayerData;
 import cn.daniellee.plugin.lr.runnable.LiveRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -13,6 +14,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
+
+import java.math.BigDecimal;
 
 public class PlayerListener implements Listener {
 
@@ -29,7 +32,7 @@ public class PlayerListener implements Listener {
 						LiveCore.recorder.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, LiveCore.recorder.getLocation(), 1);
 					}
 				} else {
-					LiveRunnable.resetRecordedSeconds();
+					LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
 				}
 			}
 		}
@@ -39,7 +42,16 @@ public class PlayerListener implements Listener {
         ActivePlayer activePlayer = LiveCore.getActivePlayerByName(player.getName());
         if (activePlayer != null) {
 	        activePlayer.setLastActive(System.currentTimeMillis());
+	        if (player.getName().equals(activePlayer.getName()) && LiveCore.recorder != null && e.getTo() != null) {
+	        	double distance = Math.sqrt(new BigDecimal(activePlayer.getBeginLocation().getX()).subtract(new BigDecimal(e.getTo().getX())).pow(2).add(new BigDecimal(activePlayer.getBeginLocation().getZ()).subtract(new BigDecimal(e.getTo().getZ())).pow(2)).add(new BigDecimal(activePlayer.getBeginLocation().getY()).subtract(new BigDecimal(e.getTo().getY())).pow(2)).doubleValue());
+	        	if (distance > LiveRecorder.getInstance().getConfig().getInt("setting.camera-reset-distance", 10)) {
+			        activePlayer.setBeginLocation(e.getTo());
+			        LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+		        }
+	        }
         } else {
+	        PlayerData playerData = LiveRecorder.getInstance().playerData.get(player.getName());
+        	if (playerData != null && playerData.isDenied()) return; // 如果玩家拒绝被直播
 	        activePlayer = new ActivePlayer(player.getName(), System.currentTimeMillis());
 	        LiveCore.activePlayers.add(activePlayer);
         }
@@ -48,6 +60,8 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
 		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && e.getTo() != null && LiveCore.recorder != null) {
+			ActivePlayer activePlayer = LiveCore.getActivePlayerByName(e.getPlayer().getName());
+			if (activePlayer != null) activePlayer.setBeginLocation(e.getTo());
 			LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
 		}
 	}

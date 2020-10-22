@@ -1,10 +1,14 @@
 package cn.daniellee.plugin.lr.model;
 
+import org.bukkit.Location;
+
 public class ActivePlayer {
 
     private String name;
 
     private long lastActive;
+
+    private Location beginLocation;
 
     public ActivePlayer(String name, long lastActive) {
         this.name = name;
@@ -25,5 +29,13 @@ public class ActivePlayer {
 
     public void setLastActive(long lastActive) {
         this.lastActive = lastActive;
+    }
+
+    public Location getBeginLocation() {
+        return beginLocation;
+    }
+
+    public void setBeginLocation(Location beginLocation) {
+        this.beginLocation = beginLocation;
     }
 }

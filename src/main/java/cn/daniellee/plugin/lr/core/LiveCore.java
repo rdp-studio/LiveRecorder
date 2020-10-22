@@ -17,6 +17,8 @@ public class LiveCore {
 
     public static String recordingPlayer;
 
+    public static String lastPlayer;
+
     public static Vector getVectorByFormTo(Location from, Location to) {
         double x = new BigDecimal(to.getX()).subtract(new BigDecimal(from.getX())).doubleValue();
         double y = new BigDecimal(to.getY()).subtract(new BigDecimal(from.getY())).doubleValue();

@@ -34,7 +34,7 @@ public class LiveRunnable extends BukkitRunnable {
                         }
                     }
                 }
-                Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.online", "&eThe live recording started, all ready for the mirror~")).replace("&", "§"));
+                if (!LiveRecorder.getInstance().isHideCamera()) Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.online", "&eThe live recording started, all ready for the mirror~")).replace("&", "§"));
                 recorder.setAllowFlight(true);
                 recorder.setFlying(true);
                 recorder.setGameMode(GameMode.SPECTATOR);
@@ -66,10 +66,16 @@ public class LiveRunnable extends BukkitRunnable {
                 ActivePlayer activePlayer = LiveCore.activePlayers.get(new Random().nextInt(LiveCore.activePlayers.size()));
                 Player player = Bukkit.getPlayer(activePlayer.getName());
                 if (player == null || !player.isValid()) return;
+                // 记录初始位置
+                activePlayer.setBeginLocation(player.getLocation());
                 // 计算镜头位置
-                player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
                 LiveCore.recorder.teleport(LiveCore.getLiveLocation(player.getLocation()));
-                LiveCore.recordingPlayer = activePlayer.getName();
+                LiveCore.recordingPlayer = player.getName();
+                // 如果不是上个玩家而且没有隐藏摄像头
+                if (!player.getName().equals(LiveCore.lastPlayer) && !LiveRecorder.getInstance().isHideCamera()) player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
+                LiveCore.lastPlayer = player.getName();
+                // 增加上镜次数
+                LiveRecorder.getInstance().playerDataYaml.set(player.getName() + ".times", LiveRecorder.getInstance().playerDataYaml.getInt(player.getName() + ".times", 0) + 1);
             }
             recordedSeconds++;
             if (recordedSeconds > recordSeconds || LiveCore.recordingPlayer == null || Bukkit.getPlayer(LiveCore.recordingPlayer) == null) recordedSeconds = 0;

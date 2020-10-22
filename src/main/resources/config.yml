@@ -17,6 +17,8 @@ setting:
   camera-pitch: 45
   #镜头距离
   camera-distance: 3
+  #重置镜头的移动距离
+  camera-reset-distance: 10
   #自动为直播员添加的权限
   recorder-permission:
     #如果安装了多世界插件，这个一定要设置
@@ -36,10 +38,14 @@ message:
   invalid-player: '&e目标玩家不存在'
   no-recorder: '&e录制者未在线, 无法设置直播目标'
   second-reset: '&e重设成功， 将自动切换直播目标'
+  toggle-set: '&e设置成功, 你将 {status} &e被直播'
   action: '&b在线人数： {online}'
   boardcast:
-   online: '&e直播开始啦， 全体做好上镜准备~'
-   offline: '&e直播结束啦， 感谢小伙伴们的支持~'
+    online: '&e直播开始啦， 全体做好上镜准备~'
+    offline: '&e直播结束啦， 感谢小伙伴们的支持~'
+  toggle-status:
+    accept: '&a会'
+    denied: '&c不会'
 
 #帮助信息
 help:
@@ -47,4 +53,5 @@ help:
   time: '&e设置每个玩家被直播的时间(单位：秒)'
   recorder: '&e设置目标玩家为直播录制者'
   reset: '&e重设直播时间, 将自动切换直播目标'
+  toggle: '&e设置自己是否会被直播(玩家使用)'
   reload: '&e重载插件配置文件'
