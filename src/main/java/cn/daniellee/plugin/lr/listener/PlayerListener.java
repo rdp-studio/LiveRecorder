@@ -43,7 +43,8 @@ public class PlayerListener implements Listener {
         if (activePlayer != null) {
 	        activePlayer.setLastActive(System.currentTimeMillis());
 	        if (player.getName().equals(activePlayer.getName()) && LiveCore.recorder != null && e.getTo() != null) {
-	        	double distance = Math.sqrt(new BigDecimal(activePlayer.getBeginLocation().getX()).subtract(new BigDecimal(e.getTo().getX())).pow(2).add(new BigDecimal(activePlayer.getBeginLocation().getZ()).subtract(new BigDecimal(e.getTo().getZ())).pow(2)).add(new BigDecimal(activePlayer.getBeginLocation().getY()).subtract(new BigDecimal(e.getTo().getY())).pow(2)).doubleValue());
+	        	if (activePlayer.getBeginLocation() == null) activePlayer.setBeginLocation(e.getFrom());
+                double distance = Math.sqrt(new BigDecimal(activePlayer.getBeginLocation().getX()).subtract(new BigDecimal(e.getTo().getX())).pow(2).add(new BigDecimal(activePlayer.getBeginLocation().getZ()).subtract(new BigDecimal(e.getTo().getZ())).pow(2)).add(new BigDecimal(activePlayer.getBeginLocation().getY()).subtract(new BigDecimal(e.getTo().getY())).pow(2)).doubleValue());
 	        	if (distance > LiveRecorder.getInstance().getConfig().getInt("setting.camera-reset-distance", 50)) {
 			        activePlayer.setBeginLocation(e.getTo());
 			        LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
