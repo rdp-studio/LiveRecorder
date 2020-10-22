@@ -71,7 +71,7 @@ public class PlayerListener implements Listener {
 		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer)) {
 			LiveRunnable.resetRecordedSeconds();
 		} else if (LiveCore.recorder != null && e.getPlayer().getName().equals(LiveCore.recorder.getName())) {
-			Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.offline", "&eThe live recording is over, thanks to the support of the friends~")).replace("&", "§"));
+			if (!LiveRecorder.getInstance().isHideCamera()) Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.offline", "&eThe live recording is over, thanks to the support of the friends~")).replace("&", "§"));
 		}
 	}
 
