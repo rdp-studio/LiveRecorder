@@ -52,7 +52,7 @@ public class RecorderCommand implements CommandExecutor {
                     LiveRunnable.resetRecordedSeconds();
                     commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.second-reset", "&eReset successfully, will automatically switch live target.")).replace("&", "§"));
                     return true;
-                } else sendHelp(commandSender);
+                }
             }
             if ("toggle".equals(strings[0]) && commandSender.hasPermission("recorder.toggle")) {
                 PlayerData playerData = LiveRecorder.getInstance().playerData.get(commandSender.getName());
@@ -63,7 +63,6 @@ public class RecorderCommand implements CommandExecutor {
                 LiveRecorder.getInstance().playerData.put(commandSender.getName(), playerData);
                 LiveRecorder.getInstance().playerDataYaml.set(commandSender.getName() + ".denied", playerData.isDenied());
                 commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.toggle-set", "&eSet up successfully, you {status} &ebroadcast.").replace("{status}", playerData.isDenied() ? LiveRecorder.getInstance().getConfig().getString("message.toggle-status.denied", "&cwill not be") : LiveRecorder.getInstance().getConfig().getString("message.toggle-status.accept", "&awill be"))).replace("&", "§"));
-                return true;
             } else sendHelp(commandSender);
         } else sendHelp(commandSender);
         return true;
