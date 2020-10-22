@@ -18,7 +18,7 @@ setting:
   #镜头距离
   camera-distance: 3
   #重置镜头的移动距离
-  camera-reset-distance: 10
+  camera-reset-distance: 50
   #自动为直播员添加的权限
   recorder-permission:
     #如果安装了多世界插件，这个一定要设置
