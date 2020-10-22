@@ -61,7 +61,7 @@ public class RecorderCommand implements CommandExecutor {
                 }
                 playerData.setDenied(!playerData.isDenied());
                 LiveRecorder.getInstance().playerData.put(commandSender.getName(), playerData);
-                LiveRecorder.getInstance().playerDataYaml.set(commandSender.getName() + ".denied", playerData.isDenied());
+                LiveRecorder.getInstance().updatePlayerDataYaml(commandSender.getName() + ".denied", playerData.isDenied());
                 commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.toggle-set", "&eSet up successfully, you {status} &ebroadcast.").replace("{status}", playerData.isDenied() ? LiveRecorder.getInstance().getConfig().getString("message.toggle-status.denied", "&cwill not be") : LiveRecorder.getInstance().getConfig().getString("message.toggle-status.accept", "&awill be"))).replace("&", "§"));
             } else sendHelp(commandSender);
         } else sendHelp(commandSender);

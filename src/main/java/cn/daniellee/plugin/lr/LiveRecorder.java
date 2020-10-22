@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class LiveRecorder extends JavaPlugin {
             playerDataYaml.load(playerDataFile);
         } catch (Exception e) {
             this.getLogger().info(" ");
-            this.getLogger().info("[LiveRecorder]An error occurred in player / reward file load.".replace("&", "§"));
+            this.getLogger().info("[LiveRecorder]An error occurred in player file load.".replace("&", "§"));
             this.getLogger().info(" ");
             e.printStackTrace();
         }
@@ -92,6 +93,18 @@ public class LiveRecorder extends JavaPlugin {
 
     public boolean isHideCamera() {
         return hideCamera;
+    }
+
+    public void updatePlayerDataYaml(String key, Object value) {
+        playerDataYaml.set(key, value);
+        try {
+            playerDataYaml.save(playerDataFile);
+        } catch (IOException e) {
+            this.getLogger().info(" ");
+            this.getLogger().info("[LiveRecorder]An error occurred in player file save.".replace("&", "§"));
+            this.getLogger().info(" ");
+            e.printStackTrace();
+        }
     }
 
     public static Class<?> getNMSClass(String nmsClassName) throws ClassNotFoundException {

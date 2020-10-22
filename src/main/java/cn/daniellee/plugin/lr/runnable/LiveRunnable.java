@@ -75,7 +75,7 @@ public class LiveRunnable extends BukkitRunnable {
                 if (!player.getName().equals(LiveCore.lastPlayer) && !LiveRecorder.getInstance().isHideCamera()) player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
                 LiveCore.lastPlayer = player.getName();
                 // 增加上镜次数
-                LiveRecorder.getInstance().playerDataYaml.set(player.getName() + ".times", LiveRecorder.getInstance().playerDataYaml.getInt(player.getName() + ".times", 0) + 1);
+	            LiveRecorder.getInstance().updatePlayerDataYaml(player.getName() + ".times", LiveRecorder.getInstance().playerDataYaml.getInt(player.getName() + ".times", 0) + 1);
             }
             recordedSeconds++;
             if (recordedSeconds > recordSeconds || LiveCore.recordingPlayer == null || Bukkit.getPlayer(LiveCore.recordingPlayer) == null) recordedSeconds = 0;
