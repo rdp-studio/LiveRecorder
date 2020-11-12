@@ -22,11 +22,13 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
         Player player = e.getPlayer();
+		// 如果是Recorder直接跳过
+		if (LiveCore.recorder != null && player.getName().equals(LiveCore.recorder.getName())) return;
 		ActivePlayer activePlayer = LiveCore.getActivePlayerByName(player.getName());
 		// 如果正在被录制则移动镜头
 		if (player.getName().equals(LiveCore.recordingPlayer)) {
-			// 位置追踪
 			if (LiveCore.recorder != null && e.getTo() != null) {
+				// 位置追踪
 				if (LiveCore.recorder.canSee(player)) {
 					LiveCore.recorder.setVelocity(LiveCore.getVectorByFormTo(e.getFrom(), e.getTo()));
 					// 显示镜头位置粒子
@@ -36,19 +38,17 @@ public class PlayerListener implements Listener {
 				} else {
 					LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
 				}
-			}
-			// 镜头修正
-			if (activePlayer != null) {
-				if (activePlayer.getBeginLocation() == null) activePlayer.setBeginLocation(e.getFrom());
-				double distance = Math.sqrt(new BigDecimal(activePlayer.getBeginLocation().getX()).subtract(new BigDecimal(e.getTo().getX())).pow(2).add(new BigDecimal(activePlayer.getBeginLocation().getZ()).subtract(new BigDecimal(e.getTo().getZ())).pow(2)).add(new BigDecimal(activePlayer.getBeginLocation().getY()).subtract(new BigDecimal(e.getTo().getY())).pow(2)).doubleValue());
-				if (distance > LiveRecorder.getInstance().getConfig().getInt("setting.camera-reset-distance", 50)) {
-					activePlayer.setBeginLocation(e.getTo());
-					LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+				// 镜头修正
+				if (activePlayer != null) {
+					if (activePlayer.getBeginLocation() == null) activePlayer.setBeginLocation(e.getFrom());
+					double distance = Math.sqrt(new BigDecimal(activePlayer.getBeginLocation().getX()).subtract(new BigDecimal(e.getTo().getX())).pow(2).add(new BigDecimal(activePlayer.getBeginLocation().getZ()).subtract(new BigDecimal(e.getTo().getZ())).pow(2)).add(new BigDecimal(activePlayer.getBeginLocation().getY()).subtract(new BigDecimal(e.getTo().getY())).pow(2)).doubleValue());
+					if (distance > LiveRecorder.getInstance().getConfig().getInt("setting.camera-reset-distance", 50)) {
+						activePlayer.setBeginLocation(e.getTo());
+						LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+					}
 				}
 			}
 		}
-		// 如果是Recorder直接跳过
-        if (LiveCore.recorder != null && player.getName().equals(LiveCore.recorder.getName())) return;
         // 更新活跃玩家列表
         if (activePlayer != null) {
 	        activePlayer.setLastActive(System.currentTimeMillis());
