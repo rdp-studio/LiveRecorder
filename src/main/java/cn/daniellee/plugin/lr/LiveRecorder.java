@@ -69,7 +69,7 @@ public class LiveRecorder extends JavaPlugin {
         for (String name : names) {
             PlayerData data = new PlayerData(name);
             data.setDenied(playerDataYaml.getBoolean(name + ".denied"));
-            data.setTimes(playerDataYaml.getInt(name + "times", 0));
+            data.setTimes(playerDataYaml.getInt(name + ".times", 0));
             playerData.put(name, data);
         }
     }
