@@ -1,6 +1,22 @@
 #提示信息前缀
 prompt-prefix: '&a直播助手'
 
+#存储配置
+storage:
+  mysql:
+    #是否使用Mysql
+    use: false
+    #连接信息
+    host: localhost
+    port: 3306
+    username: username
+    password: password
+    database: minecraft
+    parameter: 'characterEncoding=utf-8&useSSL=false&autoReconnect=true'
+    table_perfix: 'lr_'
+    #如果设置为true，下次启动自动从Yaml导入数据到Mysql
+    convert: false
+
 #全局配置
 setting:
   #直播员名字

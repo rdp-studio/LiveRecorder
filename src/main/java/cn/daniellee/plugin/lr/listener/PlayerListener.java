@@ -24,46 +24,48 @@ public class PlayerListener implements Listener {
         Player player = e.getPlayer();
 		// 如果是Recorder直接跳过
 		if (LiveCore.recorder != null && player.getName().equals(LiveCore.recorder.getName())) return;
-		ActivePlayer activePlayer = LiveCore.getActivePlayerByName(player.getName());
-		// 如果正在被录制则移动镜头
-		if (player.getName().equals(LiveCore.recordingPlayer)) {
-			if (LiveCore.recorder != null && e.getTo() != null) {
-				// 位置追踪
-				if (LiveCore.recorder.canSee(player)) {
-					LiveCore.recorder.setVelocity(LiveCore.getVectorByFormTo(e.getFrom(), e.getTo()));
-					// 显示镜头位置粒子
-					if (!LiveRecorder.getInstance().isHideCamera()) {
-						LiveCore.recorder.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, LiveCore.recorder.getLocation(), 1);
-					}
-				} else {
-					LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
-				}
-				// 镜头修正
-				if (activePlayer != null) {
-					if (activePlayer.getBeginLocation() == null) activePlayer.setBeginLocation(e.getFrom());
-					double distance = Math.sqrt(new BigDecimal(activePlayer.getBeginLocation().getX()).subtract(new BigDecimal(e.getTo().getX())).pow(2).add(new BigDecimal(activePlayer.getBeginLocation().getZ()).subtract(new BigDecimal(e.getTo().getZ())).pow(2)).add(new BigDecimal(activePlayer.getBeginLocation().getY()).subtract(new BigDecimal(e.getTo().getY())).pow(2)).doubleValue());
-					if (distance > LiveRecorder.getInstance().getConfig().getInt("setting.camera-reset-distance", 50)) {
-						activePlayer.setBeginLocation(e.getTo());
+		synchronized (LiveCore.activePlayers) {
+			ActivePlayer activePlayer = LiveCore.activePlayers.get(player.getName());
+			// 如果正在被录制则移动镜头
+			if (player.getName().equals(LiveCore.recordingPlayer)) {
+				if (LiveCore.recorder != null && e.getTo() != null) {
+					// 位置追踪
+					if (LiveCore.recorder.canSee(player)) {
+						LiveCore.recorder.setVelocity(LiveCore.getVectorByFormTo(e.getFrom(), e.getTo()));
+						// 显示镜头位置粒子
+						if (LiveRecorder.getInstance().showCamera()) {
+							LiveCore.recorder.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, LiveCore.recorder.getLocation(), 1);
+						}
+					} else {
 						LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+					}
+					// 镜头修正
+					if (activePlayer != null) {
+						if (activePlayer.getBeginLocation() == null) activePlayer.setBeginLocation(e.getFrom());
+						double distance = Math.sqrt(new BigDecimal(activePlayer.getBeginLocation().getX()).subtract(new BigDecimal(e.getTo().getX())).pow(2).add(new BigDecimal(activePlayer.getBeginLocation().getZ()).subtract(new BigDecimal(e.getTo().getZ())).pow(2)).add(new BigDecimal(activePlayer.getBeginLocation().getY()).subtract(new BigDecimal(e.getTo().getY())).pow(2)).doubleValue());
+						if (distance > LiveRecorder.getInstance().getConfig().getInt("setting.camera-reset-distance", 50)) {
+							activePlayer.setBeginLocation(e.getTo());
+							LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+						}
 					}
 				}
 			}
+			// 更新活跃玩家列表
+			if (activePlayer != null) {
+				activePlayer.setLastActive(System.currentTimeMillis());
+			} else {
+				PlayerData playerData = LiveRecorder.getInstance().getStorage().getPlayerDataByName(player.getName());
+				if (playerData != null && playerData.isDenied()) return; // 如果玩家拒绝被直播
+				activePlayer = new ActivePlayer(player.getName(), System.currentTimeMillis());
+				LiveCore.activePlayers.put(player.getName(), activePlayer);
+			}
 		}
-        // 更新活跃玩家列表
-        if (activePlayer != null) {
-	        activePlayer.setLastActive(System.currentTimeMillis());
-        } else {
-	        PlayerData playerData = LiveRecorder.getInstance().playerData.get(player.getName());
-        	if (playerData != null && playerData.isDenied()) return; // 如果玩家拒绝被直播
-	        activePlayer = new ActivePlayer(player.getName(), System.currentTimeMillis());
-	        LiveCore.activePlayers.add(activePlayer);
-        }
 	}
 
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
 		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && e.getTo() != null && LiveCore.recorder != null) {
-			ActivePlayer activePlayer = LiveCore.getActivePlayerByName(e.getPlayer().getName());
+			ActivePlayer activePlayer = LiveCore.activePlayers.get(e.getPlayer().getName());
 			if (activePlayer != null) activePlayer.setBeginLocation(e.getTo());
 			LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
 		}
@@ -74,8 +76,10 @@ public class PlayerListener implements Listener {
 		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer)) {
 			LiveRunnable.resetRecordedSeconds();
 		} else if (LiveCore.recorder != null && e.getPlayer().getName().equals(LiveCore.recorder.getName())) {
-			if (!LiveRecorder.getInstance().isHideCamera()) Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.offline", "&eThe live recording is over, thanks to the support of the friends~")).replace("&", "§"));
+			if (LiveRecorder.getInstance().showCamera()) Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.offline", "&eThe live recording is over, thanks to the support of the friends~")).replace("&", "§"));
+			LiveCore.recorder = null;
 		}
+		LiveCore.activePlayers.remove(e.getPlayer().getName()); // 移出活跃玩家列表
 	}
 
 	@EventHandler
