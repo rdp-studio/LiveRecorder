@@ -6,7 +6,7 @@
 
 	<groupId>cn.daniellee.plugin.se</groupId>
 	<artifactId>LiveRecorder</artifactId>
-	<version>1.5.0 Alpha</version>
+	<version>1.5.1 Alpha</version>
 	<packaging>jar</packaging>
 
 	<name>LiveRecorder</name>

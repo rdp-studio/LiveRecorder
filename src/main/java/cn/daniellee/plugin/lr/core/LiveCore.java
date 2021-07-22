@@ -5,7 +5,6 @@ import cn.daniellee.plugin.lr.model.ActivePlayer;
 import com.google.common.collect.Iterables;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -16,10 +15,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -58,7 +55,8 @@ public class LiveCore {
             DataOutputStream msgOut = new DataOutputStream(msgBytes);
             try {
                 msgOut.writeUTF("Player");
-                String[] players = (String[]) activePlayers.values().stream().filter(i -> !i.isExternal()).collect(Collectors.toList()).stream().map(i -> i.getName() + ";" + i.getLastActive() + ";" + serverName).toArray();
+                List<String> players = new ArrayList<>();
+                activePlayers.values().stream().filter(i -> !i.isExternal()).collect(Collectors.toList()).forEach(i -> players.add(i.getName() + ";" + i.getLastActive() + ";" + serverName));
                 msgOut.writeUTF(StringUtils.join(players, ","));
             } catch (IOException ignored){}
             out.writeShort(msgBytes.toByteArray().length);
