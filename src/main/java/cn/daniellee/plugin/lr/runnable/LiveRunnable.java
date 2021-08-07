@@ -5,17 +5,13 @@ import cn.daniellee.plugin.lr.component.ActionSender;
 import cn.daniellee.plugin.lr.core.LiveCore;
 import cn.daniellee.plugin.lr.model.ActivePlayer;
 import com.google.common.collect.Iterables;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LiveRunnable extends BukkitRunnable {
@@ -90,55 +86,13 @@ public class LiveRunnable extends BukkitRunnable {
         } else if (LiveCore.recorder == null) return;
         // 如果收到了目标玩家，直播目标玩家
         if (LiveCore.nextPlayer != null) {
-            Player player = Bukkit.getPlayer(LiveCore.nextPlayer);
             ActivePlayer activePlayer = LiveCore.activePlayers.get(LiveCore.nextPlayer);
             LiveCore.nextPlayer = null; // 置空
-            if (player == null || !player.isValid() || activePlayer == null || activePlayer.isExternal()) return; // 玩家是假的就结束
-            // 记录初始位置
-            activePlayer.setBeginLocation(player.getLocation());
-            LiveCore.recorder.teleport(LiveCore.getLiveLocation(player.getLocation()));
-            LiveCore.recordingPlayer = player.getName();
-            // 如果不是上个玩家而且没有隐藏摄像头
-            if (!player.getName().equals(LiveCore.lastPlayer) && LiveRecorder.getInstance().showCamera()) player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
-            LiveCore.lastPlayer = player.getName();
-            // 增加上镜次数
-            LiveRecorder.getInstance().getStorage().updatePlayerData(player.getName(), "times", String.valueOf(LiveRecorder.getInstance().getStorage().getPlayerDataByName(player.getName()).getTimes() + 1));
+            LiveCore.recordPlayer(activePlayer);
             recordedSeconds = 0;
         } else if (LiveCore.recorder != null && recordedSeconds == 0 && !LiveCore.activePlayers.isEmpty()) { // 随机将一位玩家进行直播
             ActivePlayer activePlayer = (ActivePlayer) LiveCore.activePlayers.values().toArray()[new Random().nextInt(LiveCore.activePlayers.size())];
-            if (!activePlayer.isExternal()) { // 如果是当前服务器的玩家
-                Player player = Bukkit.getPlayer(activePlayer.getName());
-                if (player == null || !player.isValid()) return; // 玩家是假的就结束
-                // 记录初始位置
-                activePlayer.setBeginLocation(player.getLocation());
-                LiveCore.recorder.teleport(LiveCore.getLiveLocation(player.getLocation()));
-                LiveCore.recordingPlayer = player.getName();
-                // 如果不是上个玩家而且没有隐藏摄像头
-                if (!player.getName().equals(LiveCore.lastPlayer) && LiveRecorder.getInstance().showCamera()) player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
-                LiveCore.lastPlayer = player.getName();
-                // 增加上镜次数
-                LiveRecorder.getInstance().getStorage().updatePlayerData(player.getName(), "times", String.valueOf(LiveRecorder.getInstance().getStorage().getPlayerDataByName(player.getName()).getTimes() + 1));
-            } else { // 发送目标玩家信息并将直播员传送到目标服务器
-                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                out.writeUTF("Forward");
-                out.writeUTF(activePlayer.getServer());
-                out.writeUTF("LiveRecorder");
-                ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
-                DataOutputStream msgOut = new DataOutputStream(msgBytes);
-                try {
-                    msgOut.writeUTF("Target");
-                    msgOut.writeUTF(activePlayer.getName());
-                } catch (IOException ignored){}
-                out.writeShort(msgBytes.toByteArray().length);
-                out.write(msgBytes.toByteArray());
-                LiveCore.recorder.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
-                LiveCore.goingOther = true;
-                // 传送直播员到目标服务器
-                out = ByteStreams.newDataOutput();
-                out.writeUTF("Connect");
-                out.writeUTF(activePlayer.getServer());
-                LiveCore.recorder.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
-            }
+            LiveCore.recordPlayer(activePlayer);
         }
         recordedSeconds++;
         if (recordedSeconds > recordSeconds || LiveCore.recordingPlayer == null || Bukkit.getPlayer(LiveCore.recordingPlayer) == null) recordedSeconds = 0;

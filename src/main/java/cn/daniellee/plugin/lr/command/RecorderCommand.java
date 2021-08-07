@@ -2,8 +2,10 @@ package cn.daniellee.plugin.lr.command;
 
 import cn.daniellee.plugin.lr.LiveRecorder;
 import cn.daniellee.plugin.lr.core.LiveCore;
+import cn.daniellee.plugin.lr.model.ActivePlayer;
 import cn.daniellee.plugin.lr.model.PlayerData;
 import cn.daniellee.plugin.lr.runnable.LiveRunnable;
+import com.google.common.collect.Iterables;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -27,14 +29,17 @@ public class RecorderCommand implements CommandExecutor {
                     commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.reload-success", "&eConfiguration reload completed.")).replace("&", "§"));
                     return true;
                 } else if ("target".equalsIgnoreCase(strings[0]) && strings.length > 1) {
-                    Player target = Bukkit.getPlayer(strings[1]);
+                    ActivePlayer target = LiveCore.activePlayers.get(strings[1]);
                     if (target != null) {
                         if (LiveCore.recorder != null) {
-                            LiveCore.recorder.teleport(LiveCore.getLiveLocation(target.getLocation()));
-                            LiveCore.recordingPlayer = strings[1];
+                            LiveCore.recordPlayer(target);
+                            commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.target-set", "&eThe target player has been set as the recording object.")).replace("&", "§"));
+                        } else if (LiveRecorder.getInstance().isBungeecord()) {
+                            Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+                            if (player != null) LiveCore.sendChangeMessage(player, target.getName());
                             commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.target-set", "&eThe target player has been set as the recording object.")).replace("&", "§"));
                         } else commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.no-recorder", "&eThe recorder is not online and cannot set the target.")).replace("&", "§"));
-                    } else commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.invalid-player", "&eTarget player does not exist.")).replace("&", "§"));
+                    } else commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.invalid-player", "&eThe target player is not online or inactive.")).replace("&", "§"));
                     return true;
                 } else if ("time".equalsIgnoreCase(strings[0]) && strings.length > 1) {
                     LiveRecorder.getInstance().getConfig().set("setting.record-seconds", Integer.valueOf(strings[1]));

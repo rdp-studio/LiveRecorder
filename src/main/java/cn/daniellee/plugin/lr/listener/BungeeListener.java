@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 public class BungeeListener implements PluginMessageListener {
 
@@ -50,17 +51,23 @@ public class BungeeListener implements PluginMessageListener {
 						}
 					}
 				} else if ("Target".equals(msg)) {
-					String playerName = msgIn.readUTF();
+					String name = msgIn.readUTF();
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							ActivePlayer targetPlayer = LiveCore.activePlayers.get(playerName);
-							if (LiveCore.recorder != null && targetPlayer != null) {
-								LiveCore.nextPlayer = playerName;
+							ActivePlayer targetPlayer = LiveCore.activePlayers.get(name);
+							if (LiveCore.recorder != null && targetPlayer != null && !targetPlayer.isExternal()) {
+								LiveCore.nextPlayer = name;
 								this.cancel();
 							}
 						}
 					}.runTaskTimerAsynchronously(LiveRecorder.getInstance(), 0, 10);
+                } else if ("Change".equals(msg)) {
+                    String name = msgIn.readUTF();
+                    if (LiveCore.recorder != null) {
+                        ActivePlayer activePlayer = LiveCore.activePlayers.get(name);
+                        LiveCore.recordPlayer(activePlayer);
+                    }
 				} else if ("Join".equals(msg)) {
                     Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.online", "&eThe live recording started, all ready for the mirror~")).replace("&", "§"));
                 } else if ("Leave".equals(msg)) {

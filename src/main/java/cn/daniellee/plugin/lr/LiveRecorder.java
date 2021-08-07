@@ -1,6 +1,7 @@
 package cn.daniellee.plugin.lr;
 
 import cn.daniellee.plugin.lr.command.RecorderCommand;
+import cn.daniellee.plugin.lr.command.RecorderCompleter;
 import cn.daniellee.plugin.lr.core.LiveCore;
 import cn.daniellee.plugin.lr.listener.BungeeListener;
 import cn.daniellee.plugin.lr.listener.PlayerListener;
@@ -41,6 +42,7 @@ public class LiveRecorder extends JavaPlugin {
             Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
 
             Bukkit.getPluginCommand("liverecorder").setExecutor(new RecorderCommand());
+            Bukkit.getPluginCommand("liverecorder").setTabCompleter(new RecorderCompleter());
 
             bungeecord = Bukkit.getServer().spigot().getConfig().getBoolean("settings.bungeecord", false);
 

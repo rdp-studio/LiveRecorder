@@ -51,7 +51,7 @@ message:
   recorder-come: '&e恭喜你上镜啦， 快在镜头前秀波操作吧~'
   target-set: '&e已设置目标玩家为直播对象'
   recorder-set: '&e已设置目标玩家为直播录制者'
-  invalid-player: '&e目标玩家不存在'
+  invalid-player: '&e目标玩家不在线或非活跃'
   no-recorder: '&e录制者未在线, 无法设置直播目标'
   second-reset: '&e重设成功， 将自动切换直播目标'
   toggle-set: '&e设置成功, 你将 {status} &e被直播'
