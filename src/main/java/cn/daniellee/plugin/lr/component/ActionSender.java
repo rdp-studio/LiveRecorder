@@ -1,6 +1,5 @@
 package cn.daniellee.plugin.lr.component;
 
-import cn.daniellee.plugin.lr.LiveRecorder;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
