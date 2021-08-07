@@ -2,18 +2,14 @@ package cn.daniellee.plugin.lr.storage;
 
 import cn.daniellee.plugin.lr.model.PlayerData;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class Storage {
 
 	public Map<String, PlayerData> allPlayerData = new HashMap<>();
 
-	public PlayerData getPlayerDataByName(String name) {
-		return allPlayerData.get(name);
-	}
+	public abstract PlayerData getPlayerDataByName(String name);
 
 	public abstract boolean initialize();
 

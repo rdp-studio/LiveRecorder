@@ -16,6 +16,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ public class LiveCore {
 
     public static String serverName = "Default";
 
-    public static final ConcurrentHashMap<String, ActivePlayer> activePlayers = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, ActivePlayer> activePlayers = new ConcurrentHashMap<>();
 
     public static Player recorder;
 
@@ -34,35 +35,68 @@ public class LiveCore {
 
     public static String nextPlayer; // 由其他服务器传过来的指定玩家
 
+    public static boolean otherRecording; // 其他服务器是否在直播
+
+    public static boolean goingOther; // 正在去其他服务器
+
+    public static HashMap<String, Integer> otherOnline = new HashMap<>();
+
     public static void fetchServerName() {
-        if (LiveRecorder.getInstance().isBungeecord()) {
-            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-            out.writeUTF("GetServer");
-            Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-            if (player != null) {
-                player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
-            }
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("GetServer");
+        Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+        if (player != null) {
+            player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
         }
     }
 
     public static void sendActivePlayerMessage(Player player) {
-        if (LiveRecorder.getInstance().isBungeecord()) {
-            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-            out.writeUTF("Forward");
-            out.writeUTF("ALL");
-            out.writeUTF("LiveRecorder");
-            ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
-            DataOutputStream msgOut = new DataOutputStream(msgBytes);
-            try {
-                msgOut.writeUTF("Player");
-                List<String> players = new ArrayList<>();
-                activePlayers.values().stream().filter(i -> !i.isExternal()).collect(Collectors.toList()).forEach(i -> players.add(i.getName() + ";" + i.getLastActive() + ";" + serverName));
-                msgOut.writeUTF(StringUtils.join(players, ","));
-            } catch (IOException ignored){}
-            out.writeShort(msgBytes.toByteArray().length);
-            out.write(msgBytes.toByteArray());
-            player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
-        }
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Forward");
+        out.writeUTF("ALL");
+        out.writeUTF("LiveRecorder");
+        ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
+        DataOutputStream msgOut = new DataOutputStream(msgBytes);
+        try {
+            msgOut.writeUTF("Player");
+            List<String> players = new ArrayList<>();
+            activePlayers.values().stream().filter(i -> !i.isExternal() && !i.getName().equals(LiveRecorder.getInstance().getConfig().getString("setting.recorder-name", "Recorder"))).collect(Collectors.toList()).forEach(i -> players.add(i.getName() + ";" + i.getLastActive() + ";" + serverName));
+            msgOut.writeUTF(LiveCore.serverName + ";" + players.size() + ";" + (LiveCore.recorder != null)); // 直播员是否在这个服务器，服务器在线人数
+            msgOut.writeUTF(String.join(",", players));
+        } catch (IOException ignored){}
+        out.writeShort(msgBytes.toByteArray().length);
+        out.write(msgBytes.toByteArray());
+        player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
+    }
+
+    public static void sendJoinMessage(Player player) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Forward");
+        out.writeUTF("ALL");
+        out.writeUTF("LiveRecorder");
+        ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
+        DataOutputStream msgOut = new DataOutputStream(msgBytes);
+        try {
+            msgOut.writeUTF("Join");
+        } catch (IOException ignored){}
+        out.writeShort(msgBytes.toByteArray().length);
+        out.write(msgBytes.toByteArray());
+        player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
+    }
+
+    public static void sendLeaveMessage(Player player) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Forward");
+        out.writeUTF("ALL");
+        out.writeUTF("LiveRecorder");
+        ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
+        DataOutputStream msgOut = new DataOutputStream(msgBytes);
+        try {
+            msgOut.writeUTF("Leave");
+        } catch (IOException ignored){}
+        out.writeShort(msgBytes.toByteArray().length);
+        out.write(msgBytes.toByteArray());
+        player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
     }
 
     public static Vector getVectorByFormTo(Location from, Location to) {

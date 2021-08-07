@@ -56,9 +56,8 @@ public class LiveRecorder extends JavaPlugin {
             if (bungeecord) {
                 this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
                 this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeListener());
+                LiveCore.fetchServerName();
             }
-
-            LiveCore.fetchServerName();
 
             liveTask = new LiveRunnable().runTaskTimer(this, 0, 20);
         }
@@ -119,7 +118,7 @@ public class LiveRecorder extends JavaPlugin {
     }
 
     public boolean showCamera() {
-        return hideCamera;
+        return !hideCamera;
     }
 
     public Storage getStorage() {

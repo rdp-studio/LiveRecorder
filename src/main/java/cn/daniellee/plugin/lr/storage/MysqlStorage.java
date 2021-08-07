@@ -94,6 +94,16 @@ public class MysqlStorage extends Storage {
 	}
 
 	@Override
+	public PlayerData getPlayerDataByName(String name) {
+		PlayerData playerData = allPlayerData.get(name);
+		if (playerData == null) {
+			playerData = new PlayerData(name);
+			addPlayerData(playerData);
+		}
+		return playerData;
+	}
+
+	@Override
 	public void addPlayerData(PlayerData playerData) {
 		PreparedStatement statement = null;
 		try {

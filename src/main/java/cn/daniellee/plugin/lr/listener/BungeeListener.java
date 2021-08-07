@@ -6,8 +6,11 @@ import cn.daniellee.plugin.lr.model.ActivePlayer;
 import cn.daniellee.plugin.lr.runnable.LiveRunnable;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -31,19 +34,41 @@ public class BungeeListener implements PluginMessageListener {
 			try {
 				String msg = msgIn.readUTF();
 				if ("Player".equals(msg)) {
+                    String[] info = msgIn.readUTF().split(";");
+                    LiveCore.otherOnline.put(info[0], Integer.valueOf(info[1]));
+                    if (!LiveCore.otherRecording && Boolean.parseBoolean(info[2])) {
+                        LiveCore.otherRecording = true;
+                    }
 					// 更新活跃玩家列表
 					String players = msgIn.readUTF();
-					String[] playerArray = players.split(",");
-					for (String playerString : playerArray) {
-						String[] playerInfo = playerString.split(";");
-						ActivePlayer activePlayer = new ActivePlayer(playerInfo[0], Long.valueOf(playerInfo[1]));
-						activePlayer.setExternal(true);
-						activePlayer.setServer(playerInfo[2]);
-						LiveCore.activePlayers.put(playerInfo[0], activePlayer);
+					if (players.length() > 0) {
+						String[] playerArray = players.split(",");
+						for (String playerString : playerArray) {
+							String[] playerInfo = playerString.split(";");
+							ActivePlayer activePlayer = new ActivePlayer(playerInfo[0], Long.valueOf(playerInfo[1]));
+							activePlayer.setExternal(true);
+							activePlayer.setServer(playerInfo[2]);
+							LiveCore.activePlayers.put(playerInfo[0], activePlayer);
+						}
 					}
 				} else if ("Target".equals(msg)) {
-					LiveCore.nextPlayer = msgIn.readUTF();
-				}
+					String playerName = msgIn.readUTF();
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							ActivePlayer targetPlayer = LiveCore.activePlayers.get(playerName);
+							if (LiveCore.recorder != null && targetPlayer != null) {
+								LiveCore.nextPlayer = playerName;
+								this.cancel();
+							}
+						}
+					}.runTaskTimerAsynchronously(LiveRecorder.getInstance(), 0, 10);
+				} else if ("Join".equals(msg)) {
+                    Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.online", "&eThe live recording started, all ready for the mirror~")).replace("&", "§"));
+                } else if ("Leave".equals(msg)) {
+                    LiveCore.otherRecording = false;
+                    Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.offline", "&eThe live recording is over, thanks to the support of the friends~")).replace("&", "§"));
+                }
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

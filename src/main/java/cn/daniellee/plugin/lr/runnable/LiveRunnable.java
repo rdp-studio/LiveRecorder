@@ -15,9 +15,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LiveRunnable extends BukkitRunnable {
 
@@ -44,16 +43,27 @@ public class LiveRunnable extends BukkitRunnable {
                     }
                 }
                 // 播报直播员上线
-                if (LiveRecorder.getInstance().showCamera()) Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.online", "&eThe live recording started, all ready for the mirror~")).replace("&", "§"));
+                if (LiveRecorder.getInstance().showCamera() && !LiveCore.otherRecording) {
+                    Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.online", "&eThe live recording started, all ready for the mirror~")).replace("&", "§"));
+                    if (LiveRecorder.getInstance().isBungeecord()) {
+                        Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+                        if (player != null) LiveCore.sendJoinMessage(player);
+                    }
+                }
                 recorder.setAllowFlight(true);
                 recorder.setFlying(true);
                 recorder.setGameMode(GameMode.SPECTATOR);
                 LiveCore.recorder = recorder;
-            } else return; // 直播员不在线直接结束
+            }
         } else { // 如果直播员在线
+            LiveCore.otherRecording = false;
             if (LiveCore.recorder.isValid()) {
                 // 显示在线信息
-                ActionSender.send(LiveCore.recorder, LiveRecorder.getInstance().getConfig().getString("message.action", "&bOnline: {online}").replace("{online}", Integer.toString(Bukkit.getOnlinePlayers().size())).replace("&", "§"));
+                AtomicInteger online = new AtomicInteger(Bukkit.getOnlinePlayers().size());
+                if (LiveRecorder.getInstance().isBungeecord()) { // 添加其他服务器在线人数
+                    LiveCore.otherOnline.values().forEach(online::addAndGet);
+                }
+                ActionSender.send(LiveCore.recorder, LiveRecorder.getInstance().getConfig().getString("message.action", "&bOnline: {online}").replace("{online}", Integer.toString(online.get())).replace("&", "§"));
             } else {
                 if (LiveCore.recorder.isDead()) LiveCore.recorder.setHealth(20);
                 if (!LiveCore.recorder.isValid()) {
@@ -69,12 +79,15 @@ public class LiveRunnable extends BukkitRunnable {
         // 清理不活跃的
         for (ActivePlayer activePlayer : LiveCore.activePlayers.values()) {
             Player player = Bukkit.getPlayer(activePlayer.getName());
-            if (player == null || !player.isValid() || System.currentTimeMillis() - activePlayer.getLastActive() > inactivityTimeout * 1000) {
+            if (System.currentTimeMillis() - activePlayer.getLastActive() > inactivityTimeout * 1000 || (!activePlayer.isExternal() && (player == null || !player.isValid()))) {
                 LiveCore.activePlayers.remove(activePlayer.getName());
             }
         }
         // 发送活跃玩家列表
-        if (LiveRecorder.getInstance().isBungeecord()) LiveCore.sendActivePlayerMessage(LiveCore.recorder);
+        if (LiveRecorder.getInstance().isBungeecord()) {
+            Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+            if (player != null) LiveCore.sendActivePlayerMessage(player);
+        } else if (LiveCore.recorder == null) return;
         // 如果收到了目标玩家，直播目标玩家
         if (LiveCore.nextPlayer != null) {
             Player player = Bukkit.getPlayer(LiveCore.nextPlayer);
@@ -91,10 +104,8 @@ public class LiveRunnable extends BukkitRunnable {
             // 增加上镜次数
             LiveRecorder.getInstance().getStorage().updatePlayerData(player.getName(), "times", String.valueOf(LiveRecorder.getInstance().getStorage().getPlayerDataByName(player.getName()).getTimes() + 1));
             recordedSeconds = 0;
-        }
-        // 随机将一位玩家进行直播
-        else if (recordedSeconds == 0 && !LiveCore.activePlayers.isEmpty()) {
-            ActivePlayer activePlayer = ((List<ActivePlayer>) LiveCore.activePlayers.values()).get(new Random().nextInt(LiveCore.activePlayers.size()));
+        } else if (LiveCore.recorder != null && recordedSeconds == 0 && !LiveCore.activePlayers.isEmpty()) { // 随机将一位玩家进行直播
+            ActivePlayer activePlayer = (ActivePlayer) LiveCore.activePlayers.values().toArray()[new Random().nextInt(LiveCore.activePlayers.size())];
             if (!activePlayer.isExternal()) { // 如果是当前服务器的玩家
                 Player player = Bukkit.getPlayer(activePlayer.getName());
                 if (player == null || !player.isValid()) return; // 玩家是假的就结束
@@ -121,6 +132,7 @@ public class LiveRunnable extends BukkitRunnable {
                 out.writeShort(msgBytes.toByteArray().length);
                 out.write(msgBytes.toByteArray());
                 LiveCore.recorder.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
+                LiveCore.goingOther = true;
                 // 传送直播员到目标服务器
                 out = ByteStreams.newDataOutput();
                 out.writeUTF("Connect");

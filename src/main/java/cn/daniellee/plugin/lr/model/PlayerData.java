@@ -10,6 +10,8 @@ public class PlayerData {
 
 	public PlayerData(String name) {
 		this.name = name;
+		this.denied = false;
+		this.times = 0;
 	}
 
 	public String getName() {
