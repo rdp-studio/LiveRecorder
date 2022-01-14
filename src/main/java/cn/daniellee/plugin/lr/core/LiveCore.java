@@ -26,6 +26,8 @@ public class LiveCore {
 
     public static ConcurrentHashMap<String, ActivePlayer> activePlayers = new ConcurrentHashMap<>();
 
+    public static boolean living = true;
+
     public static Player recorder;
 
     public static String recordingPlayer;

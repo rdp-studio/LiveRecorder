@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class RecorderCompleter implements TabCompleter {
 
-	private String[] subCommands = {"target", "time", "recorder", "reset", "toggle", "reload"};
+	private String[] subCommands = {"switch", "target", "time", "recorder", "reset", "toggle", "reload"};
 	private String[] times = {"15", "30", "60"};
 
 	@Override

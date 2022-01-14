@@ -56,7 +56,7 @@ public class PlayerListener implements Listener {
 		}
 		// 每半秒更新一次，避免过度耗费性能
 		long now = System.currentTimeMillis();
-		if (now - lastUpdateActive < 500) return;
+		if (!LiveCore.living || now - lastUpdateActive < 500) return;
 		lastUpdateActive = now;
 		// 更新活跃玩家列表
 		if (activePlayer != null) {
@@ -94,10 +94,10 @@ public class PlayerListener implements Listener {
 		} else if (LiveCore.recorder != null && e.getPlayer().getName().equals(LiveCore.recorder.getName())) {
 			if (LiveRecorder.getInstance().showCamera() && !LiveCore.goingOther) {
 				Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.offline", "&eThe live recording is over, thanks to the support of the friends~")).replace("&", "§"));
-				if (LiveRecorder.getInstance().isBungeecord()) {
-					Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-					if (player != null) LiveCore.sendLeaveMessage(player);
-				}
+			}
+			if (LiveRecorder.getInstance().isBungeecord() && !LiveCore.goingOther) {
+				Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+				if (player != null) LiveCore.sendLeaveMessage(player);
 			}
 			LiveCore.recorder = null;
 			LiveCore.goingOther = false;

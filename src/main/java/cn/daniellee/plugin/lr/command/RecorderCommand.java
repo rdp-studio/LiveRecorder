@@ -28,6 +28,21 @@ public class RecorderCommand implements CommandExecutor {
                     LiveRecorder.getInstance().loadConfig();
                     commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.reload-success", "&eConfiguration reload completed.")).replace("&", "§"));
                     return true;
+                } else if ("switch".equalsIgnoreCase(strings[0])) {
+                    LiveCore.living = !LiveCore.living;
+                    if (!LiveCore.living) { // 如果是关闭
+                        if (LiveRecorder.getInstance().showCamera()) {
+                            Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.offline", "&eThe live recording is over, thanks to the support of the friends~")).replace("&", "§"));
+                        }
+                        LiveCore.recorder = null;
+                        LiveCore.goingOther = false;
+                        LiveCore.activePlayers.clear();
+                        Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+                        if (player != null) LiveCore.sendActivePlayerMessage(player);
+                        LiveRunnable.resetRecordedSeconds();
+                    }
+                    commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.record-switch", "&eCurrent live status: {status}&e.").replace("{status}", LiveCore.living ? LiveRecorder.getInstance().getConfig().getString("message.record-status.open", "&aOpen") : LiveRecorder.getInstance().getConfig().getString("message.record-status.close", "&cClose"))).replace("&", "§"));
+                    return true;
                 } else if ("target".equalsIgnoreCase(strings[0]) && strings.length > 1) {
                     ActivePlayer target = LiveCore.activePlayers.get(strings[1]);
                     if (target != null) {
@@ -77,28 +92,35 @@ public class RecorderCommand implements CommandExecutor {
     private void sendHelp(CommandSender commandSender) {
         commandSender.sendMessage(("&m&a----&m&6----------&3 " + LiveRecorder.getInstance().getConfig().getString("prompt-prefix", "LiveRecorder") + " &m&6----------&m&a----").replace("&", "§"));
 
-        String targetText = LiveRecorder.getInstance().getConfig().getString("help.target", "Set the target player as the broadcast object.").replace("&", "§");
+        String switchText = LiveRecorder.getInstance().getConfig().getString("help.switch", "&eSwitch the live broadcast of the current server.").replace("&", "§");
+        TextComponent switchHelp = new TextComponent("/lr switch " + switchText);
+        switchHelp.setColor(ChatColor.GRAY);
+        switchHelp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/lr switch"));
+        switchHelp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(switchText).color(ChatColor.BLUE).create()));
+        commandSender.spigot().sendMessage(switchHelp);
+
+        String targetText = LiveRecorder.getInstance().getConfig().getString("help.target", "&eSet the target player as the broadcast object.").replace("&", "§");
         TextComponent targetHelp = new TextComponent("/lr target  " + targetText);
         targetHelp.setColor(ChatColor.GRAY);
         targetHelp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/lr target "));
         targetHelp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(targetText).color(ChatColor.BLUE).create()));
         commandSender.spigot().sendMessage(targetHelp);
 
-        String timeText = LiveRecorder.getInstance().getConfig().getString("help.time", "Set the time each player is broadcast(unit: second).").replace("&", "§");
+        String timeText = LiveRecorder.getInstance().getConfig().getString("help.time", "&eSet the time each player is broadcast(unit: second).").replace("&", "§");
         TextComponent timeHelp = new TextComponent("/lr time  " + timeText);
         timeHelp.setColor(ChatColor.GRAY);
         timeHelp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/lr time "));
         timeHelp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(timeText).color(ChatColor.BLUE).create()));
         commandSender.spigot().sendMessage(timeHelp);
 
-        String recorderText = LiveRecorder.getInstance().getConfig().getString("help.recorder", "Set the target player as the live recorder.").replace("&", "§");
+        String recorderText = LiveRecorder.getInstance().getConfig().getString("help.recorder", "&eSet the target player as the live recorder.").replace("&", "§");
         TextComponent recorderHelp = new TextComponent("/lr recorder  " + recorderText);
         recorderHelp.setColor(ChatColor.GRAY);
         recorderHelp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/lr recorder "));
         recorderHelp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(recorderText).color(ChatColor.BLUE).create()));
         commandSender.spigot().sendMessage(recorderHelp);
 
-        String resetText = LiveRecorder.getInstance().getConfig().getString("help.reset", "Resetting the live broadcast time will automatically switch the live broadcast target.").replace("&", "§");
+        String resetText = LiveRecorder.getInstance().getConfig().getString("help.reset", "&eResetting the live broadcast time will automatically switch the live broadcast target.").replace("&", "§");
         TextComponent resetHelp = new TextComponent("/lr reset  " + resetText);
         resetHelp.setColor(ChatColor.GRAY);
         resetHelp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/lr reset"));
@@ -112,7 +134,7 @@ public class RecorderCommand implements CommandExecutor {
         toggleHelp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(resetText).color(ChatColor.BLUE).create()));
         commandSender.spigot().sendMessage(toggleHelp);
 
-        String reloadText = LiveRecorder.getInstance().getConfig().getString("help.reload", "Reload configuration.").replace("&", "§");
+        String reloadText = LiveRecorder.getInstance().getConfig().getString("help.reload", "&eReload configuration.").replace("&", "§");
         TextComponent reloadHelp = new TextComponent("/lr reload  " + reloadText);
         reloadHelp.setColor(ChatColor.GRAY);
         reloadHelp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/lr reload"));

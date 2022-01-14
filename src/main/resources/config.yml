@@ -49,6 +49,7 @@ setting:
 #提示信息
 message:
   reload-success: '&e配置信息重载成功'
+  record-switch: '&e当前直播状态： {status}'
   time-set: '&e每个玩家被直播的时间设置成功'
   recorder-come: '&e恭喜你上镜啦， 快在镜头前秀波操作吧~'
   target-set: '&e已设置目标玩家为直播对象'
@@ -64,9 +65,13 @@ message:
   toggle-status:
     accept: '&a会'
     denied: '&c不会'
+  record-status:
+    open: '&a开'
+    close: '&c开'
 
 #帮助信息
 help:
+  switch: '&e开关当前服务器的直播'
   target: '&e设置目标玩家为直播对象'
   time: '&e设置每个玩家被直播的时间(单位：秒)'
   recorder: '&e设置目标玩家为直播录制者'

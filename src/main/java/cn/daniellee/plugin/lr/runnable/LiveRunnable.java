@@ -24,6 +24,7 @@ public class LiveRunnable extends BukkitRunnable {
 
     @Override
     public void run() {
+        if (!LiveCore.living) return; // 关掉之后直接返回
         if (LiveCore.recorder == null) { // 如果直播员不在线
             // 检查直播员是否在线
             Player recorder = Bukkit.getPlayer(LiveRecorder.getInstance().getConfig().getString("setting.recorder-name", "Recorder"));
