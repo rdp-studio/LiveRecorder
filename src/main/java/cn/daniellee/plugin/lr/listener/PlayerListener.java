@@ -22,14 +22,16 @@ import java.math.BigDecimal;
 
 public class PlayerListener implements Listener {
 
+	private long lastUpdateActive = 0;
+
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
 		Player player = e.getPlayer();
 		// 如果是Recorder直接跳过
 		if (LiveCore.recorder != null && player.getName().equals(LiveCore.recorder.getName())) return;
 		ActivePlayer activePlayer = LiveCore.activePlayers.get(player.getName());
-		// 如果正在被录制则移动镜头
-		if (player.getName().equals(LiveCore.recordingPlayer)) {
+		// 如果不是第一人称且此正在被录制则移动镜头
+		if (!LiveRecorder.getInstance().isFirstPerspective() && player.getName().equals(LiveCore.recordingPlayer)) {
 			if (LiveCore.recorder != null && e.getTo() != null) {
 				// 位置追踪
 				if (LiveCore.recorder.canSee(player)) {
@@ -52,9 +54,13 @@ public class PlayerListener implements Listener {
 				}
 			}
 		}
+		// 每半秒更新一次，避免过度耗费性能
+		long now = System.currentTimeMillis();
+		if (now - lastUpdateActive < 500) return;
+		lastUpdateActive = now;
 		// 更新活跃玩家列表
 		if (activePlayer != null) {
-			activePlayer.setLastActive(System.currentTimeMillis());
+			activePlayer.setLastActive(now);
 			if (LiveRecorder.getInstance().isBungeecord()) {
 				activePlayer.setExternal(false);
 				activePlayer.setServer(LiveCore.serverName);
@@ -62,7 +68,7 @@ public class PlayerListener implements Listener {
 		} else {
 			PlayerData playerData = LiveRecorder.getInstance().getStorage().getPlayerDataByName(player.getName());
 			if (playerData != null && playerData.isDenied()) return; // 如果玩家拒绝被直播
-			activePlayer = new ActivePlayer(player.getName(), System.currentTimeMillis());
+			activePlayer = new ActivePlayer(player.getName(), now);
 			if (LiveRecorder.getInstance().isBungeecord()) {
 				activePlayer.setExternal(false);
 				activePlayer.setServer(LiveCore.serverName);
@@ -76,7 +82,8 @@ public class PlayerListener implements Listener {
 		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && e.getTo() != null && LiveCore.recorder != null) {
 			ActivePlayer activePlayer = LiveCore.activePlayers.get(e.getPlayer().getName());
 			if (activePlayer != null) activePlayer.setBeginLocation(e.getTo());
-			LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+			if (LiveRecorder.getInstance().isFirstPerspective()) LiveCore.recorder.setSpectatorTarget(e.getPlayer());
+			else LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
 		}
 	}
 

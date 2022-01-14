@@ -19,6 +19,8 @@ storage:
 
 #全局配置
 setting:
+  #使用第一人称视角
+  first-perspective: false
   #直播员名字
   recorder-name: Recorder
   #每个玩家的直播时间

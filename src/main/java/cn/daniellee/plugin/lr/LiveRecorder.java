@@ -30,6 +30,8 @@ public class LiveRecorder extends JavaPlugin {
 
     private boolean hideCamera;
 
+    private boolean firstPerspective;
+
     public void onEnable(){
         instance = this;
 
@@ -89,6 +91,7 @@ public class LiveRecorder extends JavaPlugin {
         }
         prefix = "&7[&b" + getConfig().get("prompt-prefix", "LiveRecorder") + "&7] &3: &r";
         hideCamera = getConfig().getBoolean("setting.hide-camera", false);
+        firstPerspective = getConfig().getBoolean("setting.first-perspective", false);
         saveDefaultConfig();
         return true;
     }
@@ -112,6 +115,10 @@ public class LiveRecorder extends JavaPlugin {
 
     public boolean showCamera() {
         return !hideCamera;
+    }
+
+    public boolean isFirstPerspective() {
+        return firstPerspective;
     }
 
     public Storage getStorage() {
