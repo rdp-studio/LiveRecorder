@@ -7,6 +7,7 @@ import cn.daniellee.plugin.lr.model.PlayerData;
 import cn.daniellee.plugin.lr.runnable.LiveRunnable;
 import com.google.common.collect.Iterables;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,6 +43,7 @@ public class PlayerListener implements Listener {
 					}
 				} else {
 					LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+					LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
 				}
 				// 镜头修正
 				if (activePlayer != null) {
@@ -50,6 +52,7 @@ public class PlayerListener implements Listener {
 					if (distance > LiveRecorder.getInstance().getConfig().getInt("setting.camera-reset-distance", 50)) {
 						activePlayer.setBeginLocation(e.getTo());
 						LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+						LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
 					}
 				}
 			}
@@ -82,8 +85,13 @@ public class PlayerListener implements Listener {
 		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && e.getTo() != null && LiveCore.recorder != null) {
 			ActivePlayer activePlayer = LiveCore.activePlayers.get(e.getPlayer().getName());
 			if (activePlayer != null) activePlayer.setBeginLocation(e.getTo());
-			if (LiveRecorder.getInstance().isFirstPerspective()) LiveCore.recorder.setSpectatorTarget(e.getPlayer());
-			else LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+			if (LiveRecorder.getInstance().isFirstPerspective()) {
+				LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
+				LiveCore.recorder.setSpectatorTarget(e.getPlayer());
+			} else {
+				LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+				LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
+			}
 		}
 	}
 

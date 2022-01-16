@@ -37,8 +37,10 @@ public class RecorderCommand implements CommandExecutor {
                         LiveCore.recorder = null;
                         LiveCore.goingOther = false;
                         LiveCore.activePlayers.clear();
-                        Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-                        if (player != null) LiveCore.sendActivePlayerMessage(player);
+                        if (LiveRecorder.getInstance().isBungeecord()) {
+                            Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+                            if (player != null) LiveCore.sendActivePlayerMessage(player);
+                        }
                         LiveRunnable.resetRecordedSeconds();
                     }
                     commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.record-switch", "&eCurrent live status: {status}&e.").replace("{status}", LiveCore.living ? LiveRecorder.getInstance().getConfig().getString("message.record-status.open", "&aOpen") : LiveRecorder.getInstance().getConfig().getString("message.record-status.close", "&cClose"))).replace("&", "§"));
