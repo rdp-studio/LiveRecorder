@@ -85,13 +85,9 @@ public class PlayerListener implements Listener {
 		if (e.getPlayer().getName().equals(LiveCore.recordingPlayer) && e.getTo() != null && LiveCore.recorder != null) {
 			ActivePlayer activePlayer = LiveCore.activePlayers.get(e.getPlayer().getName());
 			if (activePlayer != null) activePlayer.setBeginLocation(e.getTo());
-			if (LiveRecorder.getInstance().isFirstPerspective()) {
-				LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
-				LiveCore.recorder.setSpectatorTarget(e.getPlayer());
-			} else {
-				LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
-				LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
-			}
+			LiveCore.recorder.teleport(LiveCore.getLiveLocation(e.getTo()));
+			LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
+			if (LiveRecorder.getInstance().isFirstPerspective()) LiveCore.recorder.setSpectatorTarget(e.getPlayer());
 		}
 	}
 

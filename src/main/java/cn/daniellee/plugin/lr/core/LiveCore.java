@@ -124,13 +124,9 @@ public class LiveCore {
             if (player == null || !player.isValid()) return; // 玩家是假的就结束
             // 记录初始位置
             activePlayer.setBeginLocation(player.getLocation());
-            if (LiveRecorder.getInstance().isFirstPerspective()) { // 第一人称模式
-                LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
-                recorder.setSpectatorTarget(player);
-            } else { // 第三人称模式
-                recorder.teleport(LiveCore.getLiveLocation(player.getLocation()));
-                LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
-            }
+            recorder.teleport(LiveCore.getLiveLocation(player.getLocation()));
+            LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
+            if (LiveRecorder.getInstance().isFirstPerspective()) recorder.setSpectatorTarget(player);
             recordingPlayer = player.getName();
             // 如果不是上个玩家而且没有隐藏摄像头
             if (!player.getName().equals(lastPlayer) && LiveRecorder.getInstance().showCamera()) player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
