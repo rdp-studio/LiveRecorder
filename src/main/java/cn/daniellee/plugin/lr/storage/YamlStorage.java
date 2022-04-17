@@ -44,6 +44,14 @@ public class YamlStorage extends Storage {
 	}
 
 	@Override
+	public PlayerData refreshPlayerCache(String name) {
+		PlayerData playerData = getPlayerDataByName(name);
+		playerData.setDenied(playerDataYaml.getBoolean(name + ".denied"));
+		playerData.setTimes(playerDataYaml.getInt(name + ".times", 0));
+		return playerData;
+	}
+
+	@Override
 	public PlayerData getPlayerDataByName(String name) {
 		PlayerData playerData = allPlayerData.get(name);
 		if (playerData == null) {

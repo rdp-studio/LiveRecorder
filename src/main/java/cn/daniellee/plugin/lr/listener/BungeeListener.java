@@ -3,6 +3,7 @@ package cn.daniellee.plugin.lr.listener;
 import cn.daniellee.plugin.lr.LiveRecorder;
 import cn.daniellee.plugin.lr.core.LiveCore;
 import cn.daniellee.plugin.lr.model.ActivePlayer;
+import cn.daniellee.plugin.lr.model.PlayerData;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import org.bukkit.Bukkit;
@@ -68,6 +69,10 @@ public class BungeeListener implements PluginMessageListener {
                         ActivePlayer activePlayer = LiveCore.activePlayers.get(name);
                         LiveCore.recordPlayer(activePlayer);
                     }
+				} else if ("Refresh".equals(msg)) {
+					String name = msgIn.readUTF();
+					PlayerData playerData = LiveRecorder.getInstance().getStorage().refreshPlayerCache(name);
+					if (playerData.isDenied()) LiveCore.activePlayers.remove(name);
 				} else if ("Join".equals(msg)) {
                     Bukkit.broadcastMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.boardcast.online", "&eThe live recording started, all ready for the mirror~")).replace("&", "§"));
                 } else if ("Leave".equals(msg)) {

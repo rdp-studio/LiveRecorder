@@ -94,6 +94,34 @@ public class MysqlStorage extends Storage {
 	}
 
 	@Override
+	public PlayerData refreshPlayerCache(String name) {
+		PlayerData playerData = getPlayerDataByName(name);
+		PreparedStatement statement = null;
+		try {
+			String sql = "select * from " + tablePrefix + "player where `name` = ?";
+			statement = connection.prepareStatement(sql);
+			statement.setString(1, name);
+			ResultSet resultSet = statement.executeQuery();
+			if (resultSet.first()) {
+				playerData.setDenied(resultSet.getBoolean("denied"));
+				playerData.setTimes(resultSet.getInt("times"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			LiveRecorder.getInstance().getLogger().info(" ");
+			LiveRecorder.getInstance().getLogger().info("[LiveRecorder]An error occurred while reading building data from Mysql.".replace("&", "§"));
+			LiveRecorder.getInstance().getLogger().info(" ");
+		} finally {
+			if (statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException ignored) { }
+			}
+		}
+		return playerData;
+	}
+
+	@Override
 	public PlayerData getPlayerDataByName(String name) {
 		PlayerData playerData = allPlayerData.get(name);
 		if (playerData == null) {

@@ -71,6 +71,7 @@ public class LiveCore {
         player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
     }
 
+    // 直播员进入消息
     public static void sendJoinMessage(Player player) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Forward");
@@ -86,6 +87,7 @@ public class LiveCore {
         player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
     }
 
+    // 直播员退出消息
     public static void sendLeaveMessage(Player player) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Forward");
@@ -101,6 +103,7 @@ public class LiveCore {
         player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
     }
 
+    // 跨服改变直播目标
     public static void sendChangeMessage(Player player, String name) {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Forward");
@@ -117,23 +120,21 @@ public class LiveCore {
         player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
     }
 
-    public static void recordPlayer(ActivePlayer activePlayer) {
-        if (activePlayer == null) return;
-        if (!activePlayer.isExternal()) { // 如果是当前服务器的玩家
-            Player player = Bukkit.getPlayer(activePlayer.getName());
-            if (player == null || !player.isValid()) return; // 玩家是假的就结束
-            // 记录初始位置
-            activePlayer.setBeginLocation(player.getLocation());
-            recorder.teleport(LiveCore.getLiveLocation(player.getLocation()));
-            LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
-            if (LiveRecorder.getInstance().isFirstPerspective()) recorder.setSpectatorTarget(player);
-            recordingPlayer = player.getName();
-            // 如果不是上个玩家而且没有隐藏摄像头
-            if (!player.getName().equals(lastPlayer) && LiveRecorder.getInstance().showCamera()) player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
-            lastPlayer = player.getName();
-            // 增加上镜次数
-            LiveRecorder.getInstance().getStorage().updatePlayerData(player.getName(), "times", String.valueOf(LiveRecorder.getInstance().getStorage().getPlayerDataByName(player.getName()).getTimes() + 1));
-        } else sendTargetMessage(activePlayer); // 发送目标玩家信息并将直播员传送到目标服务器
+    // 发送玩家禁止被直播消息
+    public static void sendRefreshMessage(Player player, String name) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Forward");
+        out.writeUTF("ALL");
+        out.writeUTF("LiveRecorder");
+        ByteArrayOutputStream msgBytes = new ByteArrayOutputStream();
+        DataOutputStream msgOut = new DataOutputStream(msgBytes);
+        try {
+            msgOut.writeUTF("Refresh");
+            msgOut.writeUTF(name);
+        } catch (IOException ignored){}
+        out.writeShort(msgBytes.toByteArray().length);
+        out.write(msgBytes.toByteArray());
+        player.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
     }
 
     public static void sendTargetMessage(ActivePlayer activePlayer) {
@@ -156,6 +157,26 @@ public class LiveCore {
         out.writeUTF("Connect");
         out.writeUTF(activePlayer.getServer());
         recorder.sendPluginMessage(LiveRecorder.getInstance(), "BungeeCord", out.toByteArray());
+    }
+
+    public static void recordPlayer(ActivePlayer activePlayer) {
+        if (activePlayer == null) return;
+        if (!activePlayer.isExternal()) { // 如果是当前服务器的玩家
+            Player player = Bukkit.getPlayer(activePlayer.getName());
+            if (player == null || !player.isValid()) return; // 玩家是假的就结束
+            // 记录初始位置
+            activePlayer.setBeginLocation(player.getLocation());
+            recorder.teleport(LiveCore.getLiveLocation(player.getLocation()));
+            LiveCore.recorder.setGameMode(GameMode.SPECTATOR);
+            if (LiveRecorder.getInstance().isFirstPerspective()) recorder.setSpectatorTarget(player);
+            recordingPlayer = player.getName();
+            // 如果不是上个玩家而且没有隐藏摄像头
+            if (!player.getName().equals(lastPlayer) && LiveRecorder.getInstance().showCamera()) player.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.recorder-come", "&eCongratulations on your appearance, let's take a look at the camera in front of the camera~")).replace("&", "§"));
+            lastPlayer = player.getName();
+            // 增加上镜次数
+            LiveRecorder.getInstance().getStorage().updatePlayerData(player.getName(), "times", String.valueOf(LiveRecorder.getInstance().getStorage().getPlayerDataByName(player.getName()).getTimes() + 1));
+            if (LiveRecorder.getInstance().isBungeecord()) sendRefreshMessage(player, player.getName());
+        } else sendTargetMessage(activePlayer); // 发送目标玩家信息并将直播员传送到目标服务器
     }
 
     public static Vector getVectorByFormTo(Location from, Location to) {

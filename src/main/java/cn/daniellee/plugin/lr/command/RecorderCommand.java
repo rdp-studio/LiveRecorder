@@ -76,13 +76,14 @@ public class RecorderCommand implements CommandExecutor {
                     return true;
                 }
             }
-            if ("toggle".equals(strings[0]) && commandSender.hasPermission("recorder.toggle")) {
+            if ("toggle".equals(strings[0]) && commandSender instanceof Player && commandSender.hasPermission("recorder.toggle")) {
                 PlayerData playerData = LiveRecorder.getInstance().getStorage().getPlayerDataByName(commandSender.getName());
-                if (playerData == null) {
-                    playerData = new PlayerData(commandSender.getName());
-                    LiveRecorder.getInstance().getStorage().addPlayerData(playerData);
-                }
                 playerData.setDenied(!playerData.isDenied());
+                // 如果禁用了移除活跃状态
+                if (playerData.isDenied()) {
+                    LiveCore.activePlayers.remove(playerData.getName());
+                    if (LiveRecorder.getInstance().isBungeecord()) LiveCore.sendRefreshMessage((Player) commandSender, playerData.getName());
+                }
                 LiveRecorder.getInstance().getStorage().updatePlayerData(commandSender.getName(), "denied", String.valueOf(playerData.isDenied()));
                 commandSender.sendMessage((LiveRecorder.getInstance().getPrefix() + LiveRecorder.getInstance().getConfig().getString("message.toggle-set", "&eSet up successfully, you {status} &ebroadcast.").replace("{status}", playerData.isDenied() ? LiveRecorder.getInstance().getConfig().getString("message.toggle-status.denied", "&cwill not be") : LiveRecorder.getInstance().getConfig().getString("message.toggle-status.accept", "&awill be"))).replace("&", "§"));
             } else sendHelp(commandSender);
