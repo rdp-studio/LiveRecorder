@@ -54,7 +54,7 @@ public class LiveRecorder extends JavaPlugin {
                 LiveCore.fetchServerName();
             }
 
-            liveTask = new LiveRunnable().runTaskTimerAsynchronously(this, 0, 20);
+            liveTask = new LiveRunnable().runTaskTimer(this, 0, 20);
         }
     }
 

@@ -18,6 +18,7 @@ public class LiveRunnable extends BukkitRunnable {
 
     private static int recordedSeconds = 0;
 
+    // 重置直播时间（切换至下一个玩家）
     public static void resetRecordedSeconds() {
         recordedSeconds = 0;
     }

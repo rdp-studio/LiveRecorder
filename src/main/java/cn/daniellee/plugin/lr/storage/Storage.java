@@ -2,12 +2,12 @@ package cn.daniellee.plugin.lr.storage;
 
 import cn.daniellee.plugin.lr.model.PlayerData;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Storage {
 
-	public Map<String, PlayerData> allPlayerData = new ConcurrentHashMap<>();
+	public Map<String, PlayerData> allPlayerData = new HashMap<>();
 
 	public abstract PlayerData getPlayerDataByName(String name);
 
