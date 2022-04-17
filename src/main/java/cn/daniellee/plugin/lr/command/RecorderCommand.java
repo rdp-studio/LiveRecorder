@@ -82,6 +82,7 @@ public class RecorderCommand implements CommandExecutor {
                 // 如果禁用了移除活跃状态
                 if (playerData.isDenied()) {
                     LiveCore.activePlayers.remove(playerData.getName());
+                    if (playerData.getName().equals(LiveCore.recordingPlayer)) LiveRunnable.resetRecordedSeconds();
                     if (LiveRecorder.getInstance().isBungeecord()) LiveCore.sendRefreshMessage((Player) commandSender, playerData.getName());
                 }
                 LiveRecorder.getInstance().getStorage().updatePlayerData(commandSender.getName(), "denied", String.valueOf(playerData.isDenied()));
